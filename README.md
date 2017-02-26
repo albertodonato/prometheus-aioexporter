@@ -30,7 +30,7 @@ class MyExporter(PrometheusExporterScript):
     '''My Prometheus exporter.'''
 
     def configure_argument_parser(self, parser):
-        # Add scripts
+        # Additional arguments to the script
         parser.add_argument('an-option', help='an option')
         ...
 
