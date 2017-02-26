@@ -54,7 +54,7 @@ class PrometheusExporterScriptTests(LoopTestCase):
     def test_setup_logging(self, mock_setup_logger):
         '''Logging is set up.'''
         self.script._run_application = lambda *args: None
-        self.script()
+        self.script([])
         logger_names = (
             'aiohttp.access', 'aiohttp.internal', 'aiohttp.server',
             'aiohttp.web', 'sample-script')
@@ -74,7 +74,7 @@ class PrometheusExporterScriptTests(LoopTestCase):
 
     def test_create_application_registers_handlers(self):
         '''Startup/shutdown handlers are registered with the application.'''
-        args = self.script.get_parser().parse_args()
+        args = self.script.get_parser().parse_args([])
         application = self.script._create_application(args)
         self.assertIn(
             self.script.on_application_startup, application.on_startup)
@@ -83,7 +83,7 @@ class PrometheusExporterScriptTests(LoopTestCase):
 
     @mock.patch('prometheus_aioexporter.script.web.run_app')
     def test_run_application(self, mock_run_app):
-        self.script()
+        self.script([])
         mock_run_app.assert_called_with(
             mock.ANY, host='localhost', port=9090, print=mock.ANY,
             access_log_format='%a "%r" %s %b "%{Referrer}i" "%{User-Agent}i"')
