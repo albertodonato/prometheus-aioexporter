@@ -5,7 +5,7 @@ from prometheus_aioexporter import __version__, __doc__ as description
 config = {
     'name': 'prometheus-aioexporter',
     'version': __version__,
-    'license': 'GPLv3+',
+    'license': 'LGPLv3+',
     'description': description,
     'long_description': open('README.rst').read(),
     'author': 'Alberto Donato',
