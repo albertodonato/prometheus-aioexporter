@@ -21,6 +21,18 @@ config = {
         'prometheus-client',
         'toolrack'],
     'tests_require': ['asynctest'],
-    'keywords': 'prometheus exporter library'}
+    'keywords': 'prometheus exporter library',
+    'classifiers': [
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'Intended Audience :: System Administrators',
+        ('License :: OSI Approved :: '
+         'GNU Lesser General Public License v3 or later (LGPLv3+)'),
+        'Operating System :: POSIX :: Linux',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Topic :: Utilities',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: Software Development :: Libraries :: Python Modules']}
 
 setup(**config)

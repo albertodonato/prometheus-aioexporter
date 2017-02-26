@@ -36,13 +36,6 @@ class PrometheusExporterScript(Script):
 
         '''
 
-    def create_metrics(self, metric_configs):
-        '''Create and register metrics from a list of MetricConfigs.'''
-        try:
-            return create_metrics(metric_configs, self.registry)
-        except InvalidMetricType as error:
-            raise ErrorExitMessage(str(error))
-
     def on_application_startup(self, application):
         '''Handler run at Application startup.
 
@@ -65,6 +58,13 @@ class PrometheusExporterScript(Script):
         Subclasses can implement this.
 
         '''
+
+    def create_metrics(self, metric_configs):
+        '''Create and register metrics from a list of MetricConfigs.'''
+        try:
+            return create_metrics(metric_configs, self.registry)
+        except InvalidMetricType as error:
+            raise ErrorExitMessage(str(error))
 
     def get_parser(self):
         parser = argparse.ArgumentParser(

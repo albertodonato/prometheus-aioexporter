@@ -9,7 +9,7 @@ devel:
 	$(SETUP) develop
 
 clean:
-	rm -rf build html *.egg-info
+	rm -rf build *.egg-info
 	find . -type d -name __pycache__ | xargs rm -rf
 
 test:
@@ -23,7 +23,4 @@ coverage:
 lint:
 	@flake8 setup.py prometheus_aioexporter
 
-html:
-	sphinx-build -b html docs html
-
-.PHONY: build devel clean test coverage lint html
+.PHONY: build devel clean test coverage lint
