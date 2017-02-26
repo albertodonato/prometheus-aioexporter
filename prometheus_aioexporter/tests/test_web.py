@@ -7,18 +7,6 @@ from prometheus_client import CollectorRegistry, Gauge
 from ..web import PrometheusExporterApplication
 
 
-class FakeWatcher:
-
-    watch_called = False
-    stop_called = False
-
-    def watch(self):
-        self.watch_called = True
-
-    async def stop(self):
-        self.stop_called = True
-
-
 class PrometheusExporterApplicationTests(AioHTTPTestCase):
 
     def setUp(self):
