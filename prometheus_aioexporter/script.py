@@ -8,25 +8,31 @@ from aiohttp import web
 from prometheus_client import CollectorRegistry, ProcessCollector
 
 from toolrack.script import Script, ErrorExitMessage
-from toolrack.log import setup_logger
+from toolrack.log import setup_logger, Loggable
 
 from .metric import create_metrics, InvalidMetricType
 from .web import PrometheusExporterApplication
 
 
-class PrometheusExporterScript(Script):
+class PrometheusExporterScript(Script, Loggable):
     '''Expose metrics to Prometheus.'''
 
     # Name of the script, can be set by subsclasses.
     name = 'prometheus-exporter'
 
-    # Service description, can be set by subclasses.
-    description = __doc__
-
     def __init__(self, stdout=None, stderr=None, loop=None):
         super().__init__(stdout=stdout, stderr=stderr)
         self.loop = loop or asyncio.get_event_loop()
         self.registry = CollectorRegistry(auto_describe=True)
+
+    @property
+    def description(self):
+        '''Service description.
+
+        By default, return the class docstring.
+
+        '''
+        return self.__doc__
 
     def configure_argument_parser(self, parser):
         '''Add configuration to the ArgumentParser.

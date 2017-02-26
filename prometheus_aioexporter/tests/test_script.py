@@ -15,7 +15,6 @@ class PrometheusExporterScriptTests(LoopTestCase):
         super().setUp()
         self.script = PrometheusExporterScript(loop=self.loop)
         self.script.name = 'sample-script'
-        self.script.description = 'A sample script'
 
     def test_configure_argument_parser(self):
         '''configure_argument_parser adds specified arguments.'''
