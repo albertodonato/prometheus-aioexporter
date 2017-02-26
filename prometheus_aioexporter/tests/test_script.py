@@ -17,10 +17,6 @@ class PrometheusExporterScriptTests(LoopTestCase):
         self.script.name = 'sample-script'
         self.script.description = 'A sample script'
 
-    def tearDown(self):
-        self.script.loop.close()
-        super().tearDown()
-
     def test_configure_argument_parser(self):
         '''configure_argument_parser adds specified arguments.'''
 
