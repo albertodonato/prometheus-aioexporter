@@ -1,5 +1,6 @@
 # prometheus-aioexporter - Asyncio library for creating Prometheus exporters
 
+[![Latest Version](https://img.shields.io/pypi/v/prometheus-aioexporter.svg)](https://pypi.python.org/pypi/prometheus-aioexporter)
 [![Build Status](https://travis-ci.org/albertodonato/prometheus-aioexporter.svg?branch=master)](https://travis-ci.org/albertodonato/prometheus-aioexporter)
 [![Coverage Status](https://codecov.io/gh/albertodonato/prometheus-aioexporter/branch/master/graph/badge.svg)](https://codecov.io/gh/albertodonato/prometheus-aioexporter)
 
