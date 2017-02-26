@@ -23,9 +23,9 @@ class PrometheusExporterScript(Script):
     # Service description, can be set by subclasses.
     description = __doc__
 
-    def __init__(self):
-        super().__init__()
-        self.loop = asyncio.get_event_loop()
+    def __init__(self, stdout=None, stderr=None, loop=None):
+        super().__init__(stdout=stdout, stderr=stderr)
+        self.loop = loop or asyncio.get_event_loop()
         self.registry = CollectorRegistry(auto_describe=True)
 
     def configure_argument_parser(self, parser):

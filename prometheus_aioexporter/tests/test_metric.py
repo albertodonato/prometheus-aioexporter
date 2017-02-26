@@ -21,6 +21,7 @@ class CreateMetricsTests(TestCase):
             MetricConfig('m1', 'desc1', 'counter', {}),
             MetricConfig('m2', 'desc2', 'histogram', {})]
         metrics = create_metrics(configs, self.registry)
+        self.assertEqual(len(metrics), 2)
         self.assertEqual(metrics['m1']._type, 'counter')
         self.assertEqual(metrics['m2']._type, 'histogram')
 
