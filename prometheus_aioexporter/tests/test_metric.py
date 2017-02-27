@@ -9,6 +9,18 @@ from ..metric import (
 )
 
 
+class MetricConfigTests(TestCase):
+
+    def test_invalid_metric_type(self):
+        '''An invalid metric type raises an error.'''
+        with self.assertRaises(InvalidMetricType) as cm:
+            MetricConfig('m1', 'desc1', 'unknown', {})
+        self.assertEqual(
+            str(cm.exception),
+            'Invalid type for m1: must be one of counter, gauge,'
+            ' histogram, summary')
+
+
 class CreateMetricsTests(TestCase):
 
     def setUp(self):
@@ -24,16 +36,6 @@ class CreateMetricsTests(TestCase):
         self.assertEqual(len(metrics), 2)
         self.assertEqual(metrics['m1']._type, 'counter')
         self.assertEqual(metrics['m2']._type, 'histogram')
-
-    def test_invalid_metric_type(self):
-        '''An invalid metric type raises an error.'''
-        configs = [MetricConfig('m1', 'desc1', 'unknown', {})]
-        with self.assertRaises(InvalidMetricType) as cm:
-            create_metrics(configs, self.registry)
-        self.assertEqual(
-            str(cm.exception),
-            'Invalid type for m1: must be one of counter, gauge,'
-            ' histogram, summary')
 
     def test_metrics_config(self):
         '''Metric configs are applied.'''

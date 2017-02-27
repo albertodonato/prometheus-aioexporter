@@ -24,9 +24,14 @@ METRIC_TYPES = {
             'labels': 'labelnames'}}}
 
 
-# Configuration for a metric
-MetricConfig = namedtuple(
-    'MetricConfig', ['name', 'description', 'type', 'config'])
+class MetricConfig(namedtuple(
+        'MetricConfig', ['name', 'description', 'type', 'config'])):
+    '''Configuration for a metric.'''
+
+    def __new__(cls, name, description, typ, config):
+        if typ not in METRIC_TYPES:
+            raise InvalidMetricType(name, typ)
+        return super().__new__(cls, name, description, typ, config)
 
 
 class InvalidMetricType(Exception):
@@ -49,11 +54,7 @@ def create_metrics(configs, registry):
 
 def _register_metric(config, registry):
     '''Register and return a Prometheus metric.'''
-    try:
-        metric_info = METRIC_TYPES[config.type]
-    except KeyError:
-        raise InvalidMetricType(config.name, config.type)
-
+    metric_info = METRIC_TYPES[config.type]
     options = {
         metric_info['options'][key]: value
         for key, value in config.config.items()

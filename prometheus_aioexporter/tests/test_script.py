@@ -42,26 +42,6 @@ class PrometheusExporterScriptTests(LoopTestCase):
         parser.print_help(file=fh)
         self.assertIn('test argument', fh.getvalue())
 
-    def test_create_metrics(self):
-        '''Metrics are created based on the configuration.'''
-        configs = [
-            MetricConfig('m1', 'desc1', 'counter', {}),
-            MetricConfig('m2', 'desc2', 'histogram', {})]
-        metrics = self.script.create_metrics(configs)
-        self.assertEqual(len(metrics), 2)
-        self.assertEqual(metrics['m1']._type, 'counter')
-        self.assertEqual(metrics['m2']._type, 'histogram')
-
-    def test_invalid_metric_type(self):
-        '''An invalid metric type raises an ErrorExitMessage error.'''
-        configs = [MetricConfig('m1', 'desc1', 'unknown', {})]
-        with self.assertRaises(ErrorExitMessage) as cm:
-            self.script.create_metrics(configs)
-        self.assertEqual(
-            str(cm.exception),
-            'Invalid type for m1: must be one of counter, gauge,'
-            ' histogram, summary')
-
     @mock.patch('prometheus_aioexporter.script.setup_logger')
     def test_setup_logging(self, mock_setup_logger):
         '''Logging is set up.'''

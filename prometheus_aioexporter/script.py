@@ -70,13 +70,6 @@ class PrometheusExporterScript(Script):
 
         '''
 
-    def create_metrics(self, metric_configs):
-        '''Create and register metrics from a list of MetricConfigs.'''
-        try:
-            return create_metrics(metric_configs, self.registry)
-        except InvalidMetricType as error:
-            raise ErrorExitMessage(str(error))
-
     def get_parser(self):
         parser = argparse.ArgumentParser(
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
