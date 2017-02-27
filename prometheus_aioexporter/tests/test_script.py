@@ -9,12 +9,25 @@ from ..script import PrometheusExporterScript
 from ..metric import MetricConfig
 
 
+class SampleScript(PrometheusExporterScript):
+    '''A sample script'''
+
+    name = 'sample-script'
+
+
 class PrometheusExporterScriptTests(LoopTestCase):
 
     def setUp(self):
         super().setUp()
-        self.script = PrometheusExporterScript(loop=self.loop)
-        self.script.name = 'sample-script'
+        self.script = SampleScript(loop=self.loop)
+
+    def test_description(self):
+        '''The description attribute returns the class docstring.'''
+        self.assertEqual(self.script.description, 'A sample script')
+
+    def test_logger(self):
+        '''The script logger uses the script name.'''
+        self.assertEqual(self.script.logger.name, 'sample-script')
 
     def test_configure_argument_parser(self):
         '''configure_argument_parser adds specified arguments.'''

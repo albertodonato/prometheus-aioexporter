@@ -8,13 +8,13 @@ from aiohttp import web
 from prometheus_client import CollectorRegistry, ProcessCollector
 
 from toolrack.script import Script, ErrorExitMessage
-from toolrack.log import setup_logger, Loggable
+from toolrack.log import setup_logger
 
 from .metric import create_metrics, InvalidMetricType
 from .web import PrometheusExporterApplication
 
 
-class PrometheusExporterScript(Script, Loggable):
+class PrometheusExporterScript(Script):
     '''Expose metrics to Prometheus.'''
 
     # Name of the script, can be set by subsclasses.
@@ -33,6 +33,11 @@ class PrometheusExporterScript(Script, Loggable):
 
         '''
         return self.__doc__
+
+    @property
+    def logger(self):
+        '''A logger for the script.'''
+        return logging.getLogger(name=self.name)
 
     def configure_argument_parser(self, parser):
         '''Add configuration to the ArgumentParser.
