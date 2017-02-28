@@ -15,8 +15,6 @@ config = {
     'url': 'https://github.com/albertodonato/prometheus-aioexporter',
     'packages': find_packages(),
     'include_package_data': True,
-    'entry_points': {'console_scripts': [
-        'query-exporter = query_exporter.main:script']},
     'test_suite': 'prometheus_aioexporter',
     'install_requires': [
         'aiohttp',
