@@ -59,7 +59,7 @@ The `script` variable can be referenced in `setup.py` to generate the script, li
 ```python
 setup(
     ...,
-    entry_points={'console_scripts': [script = path.to.script:script']},
+    entry_points={'console_scripts': ['script = path.to.script:script']},
     ...)
 ```
 
