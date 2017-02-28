@@ -2,7 +2,6 @@ from unittest import mock
 from io import StringIO
 import logging
 
-from toolrack.script import ErrorExitMessage
 from toolrack.testing.async import LoopTestCase
 
 from ..script import PrometheusExporterScript
@@ -41,6 +40,16 @@ class PrometheusExporterScriptTests(LoopTestCase):
         fh = StringIO()
         parser.print_help(file=fh)
         self.assertIn('test argument', fh.getvalue())
+
+    def test_create_metrics(self):
+        '''Metrics are created based on the configuration.'''
+        configs = [
+            MetricConfig('m1', 'desc1', 'counter', {}),
+            MetricConfig('m2', 'desc2', 'histogram', {})]
+        metrics = self.script.create_metrics(configs)
+        self.assertEqual(len(metrics), 2)
+        self.assertEqual(metrics['m1']._type, 'counter')
+        self.assertEqual(metrics['m2']._type, 'histogram')
 
     @mock.patch('prometheus_aioexporter.script.setup_logger')
     def test_setup_logging(self, mock_setup_logger):

@@ -7,10 +7,10 @@ from aiohttp import web
 
 from prometheus_client import CollectorRegistry, ProcessCollector
 
-from toolrack.script import Script, ErrorExitMessage
+from toolrack.script import Script
 from toolrack.log import setup_logger
 
-from .metric import create_metrics, InvalidMetricType
+from .metric import create_metrics
 from .web import PrometheusExporterApplication
 
 
@@ -69,6 +69,10 @@ class PrometheusExporterScript(Script):
         Subclasses can implement this.
 
         '''
+
+    def create_metrics(self, metric_configs):
+        '''Create and register metrics from a list of MetricConfigs.'''
+        return create_metrics(metric_configs, self.registry)
 
     def get_parser(self):
         parser = argparse.ArgumentParser(
