@@ -18,7 +18,7 @@ test:
 coverage:
 	@coverage run -m unittest
 	@coverage report --show-missing --skip-covered --fail-under=100 \
-		--include=prometheus_aioexporter/* --omit=**/test_\*.py
+		--include=prometheus_aioexporter/\* --omit=\*\*/tests/\*
 
 lint:
 	@flake8 setup.py prometheus_aioexporter
