@@ -52,6 +52,13 @@ def create_metrics(configs, registry):
         for config in configs}
 
 
+def get_registry_metrics(registry):
+    '''Return a dict with metrics to metrics from a CollectorRegistry.'''
+    return {
+        metric.describe()[0].name: metric
+        for metric in registry._collector_to_names}
+
+
 def _register_metric(config, registry):
     '''Register and return a Prometheus metric.'''
     metric_info = METRIC_TYPES[config.type]

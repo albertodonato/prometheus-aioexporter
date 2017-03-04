@@ -1,11 +1,12 @@
 from unittest import TestCase
 
-from prometheus_client import CollectorRegistry
+from prometheus_client import CollectorRegistry, Gauge, Histogram
 
 from ..metric import (
     MetricConfig,
     InvalidMetricType,
-    create_metrics
+    create_metrics,
+    get_registry_metrics
 )
 
 
@@ -51,3 +52,14 @@ class CreateMetricsTests(TestCase):
             MetricConfig('m1', 'desc1', 'gauge', {'unknown': 'value'})]
         metrics = create_metrics(configs, self.registry)
         self.assertEqual(len(metrics), 1)
+
+
+class GetRegistryMetricsTests(TestCase):
+
+    def test_get_registry_metrics(self):
+        '''get_registry_metrics returns a dict with metrics.'''
+        registry = CollectorRegistry()
+        metric1 = Gauge('metric1', 'A test gauge', registry=registry)
+        metric2 = Histogram('metric2', 'A test histogram', registry=registry)
+        metrics = get_registry_metrics(registry)
+        self.assertEqual(metrics, {'metric1': metric1, 'metric2': metric2})

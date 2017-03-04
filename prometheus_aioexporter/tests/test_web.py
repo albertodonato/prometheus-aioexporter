@@ -2,7 +2,7 @@ from aiohttp.test_utils import (
     AioHTTPTestCase,
     unittest_run_loop)
 
-from prometheus_client import CollectorRegistry, Gauge
+from prometheus_client import CollectorRegistry, Gauge, Histogram
 
 from ..web import PrometheusExporterApplication
 
@@ -40,3 +40,19 @@ class PrometheusExporterApplicationTests(AioHTTPTestCase):
         text = await request.text()
         self.assertIn('HELP test_gauge A test gauge', text)
         self.assertIn('test_gauge 12.3', text)
+
+    @unittest_run_loop
+    async def test_metrics_update_handler(self):
+        '''set_metric_update_handler sets a handler called with metrics.'''
+        args = []
+
+        def update_handler(metrics):
+            args.append(metrics)
+
+        self.app.set_metric_update_handler(update_handler)
+        # add a test metric
+        metric1 = Gauge('metric1', 'A test gauge', registry=self.registry)
+        metric2 = Histogram(
+            'metric2', 'A test histogram', registry=self.registry)
+        await self.client.request('GET', '/metrics')
+        self.assertEqual(args, [{'metric1': metric1, 'metric2': metric2}])

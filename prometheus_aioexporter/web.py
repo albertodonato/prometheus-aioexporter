@@ -4,9 +4,13 @@ from aiohttp.web import Application, Response
 
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
+from .metric import get_registry_metrics
+
 
 class PrometheusExporterApplication(Application):
     '''A web application exposing Prometheus metrics.'''
+
+    _update_handler = None
 
     def __init__(self, name, description, host, port, registry, **kwargs):
         super().__init__(**kwargs)
@@ -17,6 +21,15 @@ class PrometheusExporterApplication(Application):
         self.registry = registry
         self._setup_routes()
         self.on_startup.append(self._log_startup_message)
+
+    def set_metric_update_handler(self, handler):
+        '''Set a handler to update metrics.
+
+        The provided function is called at every request with a dict as
+        argument, mapping metric names to metrics.
+
+        '''
+        self._update_handler = handler
 
     def _log_startup_message(self, app):
         '''Log message about application startup.'''
@@ -47,6 +60,8 @@ class PrometheusExporterApplication(Application):
 
     async def _handle_metrics(self, request):
         '''Handler for metrics.'''
+        if self._update_handler:
+            self._update_handler(get_registry_metrics(self.registry))
         body = generate_latest(self.registry)
         response = Response(body=body)
         response.content_type = CONTENT_TYPE_LATEST
