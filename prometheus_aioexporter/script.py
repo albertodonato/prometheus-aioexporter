@@ -1,3 +1,5 @@
+'''Run a web server providing a Prometheus metrics endpoint.'''
+
 import sys
 import logging
 import argparse

@@ -1,3 +1,5 @@
+'''Helpers around prometheus-client to create and register metrics.'''
+
 from collections import namedtuple
 
 from prometheus_client import Counter, Gauge, Histogram, Summary

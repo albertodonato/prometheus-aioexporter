@@ -1,3 +1,5 @@
+'''AioHTTP application for exposing metrics to Prometheus.'''
+
 from textwrap import dedent
 
 from aiohttp.web import Application, Response
