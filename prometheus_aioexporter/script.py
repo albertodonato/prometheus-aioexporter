@@ -32,7 +32,7 @@ class PrometheusExporterScript(Script):
         By default, return the class docstring.
 
         '''
-        return self.__doc__
+        return self.__doc__ or ''
 
     @property
     def logger(self):

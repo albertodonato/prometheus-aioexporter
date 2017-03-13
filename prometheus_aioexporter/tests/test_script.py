@@ -24,6 +24,11 @@ class PrometheusExporterScriptTests(LoopTestCase):
         '''The description attribute returns the class docstring.'''
         self.assertEqual(self.script.description, 'A sample script')
 
+    def test_description_empty(self):
+        '''The description is empty string if no docstring is set.'''
+        self.script.__doc__ = None
+        self.assertEqual(self.script.description, '')
+
     def test_logger(self):
         '''The script logger uses the script name.'''
         self.assertEqual(self.script.logger.name, 'sample-script')
