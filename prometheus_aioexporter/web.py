@@ -44,20 +44,25 @@ class PrometheusExporterApplication(Application):
 
     async def _handle_home(self, request):
         '''Home page request handler.'''
+        if self.description:
+            title = '{app.name} - {app.description}'.format(app=self)
+        else:
+            title = self.name
+
         text = dedent('''<!DOCTYPE html>
           <html>
             <head>
-              <title>{app.name} - {app.description}</title>
+              <title>{title}</title>
             </head>
             <body>
-              <h1>{app.name} - {app.description}</h1>
+              <h1>{title}</h1>
               <p>
                 Metric are exported at the
                 <a href="/metrics">/metrics</a> endpoint.
               </p>
             </body>
           </html>
-        ''').format(app=self)
+        ''').format(title=title)
         return Response(content_type='text/html', text=text)
 
     async def _handle_metrics(self, request):

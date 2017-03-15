@@ -25,7 +25,17 @@ class PrometheusExporterApplicationTests(AioHTTPTestCase):
         self.assertEqual(request.status, 200)
         self.assertEqual(request.content_type, 'text/html')
         text = await request.text()
-        self.assertIn('test-app - A test application', text)
+        self.assertIn('<title>test-app - A test application</title>', text)
+
+    @unittest_run_loop
+    async def test_homepage_no_description(self):
+        '''The title is set to just the name if no descrption is present.'''
+        self.app.description = None
+        request = await self.client.request('GET', '/')
+        self.assertEqual(request.status, 200)
+        self.assertEqual(request.content_type, 'text/html')
+        text = await request.text()
+        self.assertIn('<title>test-app</title>', text)
 
     @unittest_run_loop
     async def test_metrics(self):
