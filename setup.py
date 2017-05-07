@@ -17,7 +17,7 @@ config = {
     'include_package_data': True,
     'test_suite': 'prometheus_aioexporter',
     'install_requires': [
-        'aiohttp',
+        'aiohttp >= 2.0.0',
         'prometheus-client',
         'toolrack'],
     'tests_require': ['asynctest'],

@@ -13,10 +13,9 @@ class PrometheusExporterApplicationTests(AioHTTPTestCase):
         self.registry = CollectorRegistry(auto_describe=True)
         super().setUp()
 
-    def get_app(self, loop):
+    async def get_application(self):
         return PrometheusExporterApplication(
-            'test-app', 'A test application', 'localhost', 8000, self.registry,
-            loop=loop)
+            'test-app', 'A test application', 'localhost', 8000, self.registry)
 
     @unittest_run_loop
     async def test_homepage(self):
