@@ -1,3 +1,8 @@
+# 1.0.0 - 2017-05-07
+
+* Update to support aiohttp 2.0.0
+
+
 # v0.2.2 - 2017-03-04
 
 * Add support to provide an update handler at every request with
