@@ -1,6 +1,11 @@
+# 1.0.1 - 2017-05-20
+
+* Fix aiohttp warning because of passing loop to the application.
+
+
 # 1.0.0 - 2017-05-07
 
-* Update to support aiohttp 2.0.0
+* Update to support aiohttp 2.0.0.
 
 
 # v0.2.2 - 2017-03-04
