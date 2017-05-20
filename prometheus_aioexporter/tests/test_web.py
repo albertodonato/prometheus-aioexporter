@@ -19,7 +19,7 @@ class PrometheusExporterApplicationTests(AioHTTPTestCase):
 
     @unittest_run_loop
     async def test_homepage(self):
-        '''The homepage shows an HTML page.'''
+        """The homepage shows an HTML page."""
         request = await self.client.request('GET', '/')
         self.assertEqual(request.status, 200)
         self.assertEqual(request.content_type, 'text/html')
@@ -28,7 +28,7 @@ class PrometheusExporterApplicationTests(AioHTTPTestCase):
 
     @unittest_run_loop
     async def test_homepage_no_description(self):
-        '''The title is set to just the name if no descrption is present.'''
+        """The title is set to just the name if no descrption is present."""
         self.app.description = None
         request = await self.client.request('GET', '/')
         self.assertEqual(request.status, 200)
@@ -38,7 +38,7 @@ class PrometheusExporterApplicationTests(AioHTTPTestCase):
 
     @unittest_run_loop
     async def test_metrics(self):
-        '''The /metrics page display Prometheus metrics.'''
+        """The /metrics page display Prometheus metrics."""
         # add a test metric
         metric = Gauge(
             'test_gauge', 'A test gauge', registry=self.registry)
@@ -52,7 +52,7 @@ class PrometheusExporterApplicationTests(AioHTTPTestCase):
 
     @unittest_run_loop
     async def test_metrics_update_handler(self):
-        '''set_metric_update_handler sets a handler called with metrics.'''
+        """set_metric_update_handler sets a handler called with metrics."""
         args = []
 
         def update_handler(metrics):

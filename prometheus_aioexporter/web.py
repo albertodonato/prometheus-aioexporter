@@ -1,4 +1,4 @@
-'''AioHTTP application for exposing metrics to Prometheus.'''
+"""AioHTTP application for exposing metrics to Prometheus."""
 
 from textwrap import dedent
 
@@ -10,7 +10,7 @@ from .metric import get_registry_metrics
 
 
 class PrometheusExporterApplication(Application):
-    '''A web application exposing Prometheus metrics.'''
+    """A web application exposing Prometheus metrics."""
 
     _update_handler = None
 
@@ -25,16 +25,16 @@ class PrometheusExporterApplication(Application):
         self.on_startup.append(self._log_startup_message)
 
     def set_metric_update_handler(self, handler):
-        '''Set a handler to update metrics.
+        """Set a handler to update metrics.
 
         The provided function is called at every request with a dict as
         argument, mapping metric names to metrics.
 
-        '''
+        """
         self._update_handler = handler
 
     def _log_startup_message(self, app):
-        '''Log message about application startup.'''
+        """Log message about application startup."""
         self.logger.info(
             'Listening on http://{}:{}'.format(self.host, self.port))
 
@@ -43,7 +43,7 @@ class PrometheusExporterApplication(Application):
         self.router.add_get('/metrics', self._handle_metrics)
 
     async def _handle_home(self, request):
-        '''Home page request handler.'''
+        """Home page request handler."""
         if self.description:
             title = '{app.name} - {app.description}'.format(app=self)
         else:
@@ -66,7 +66,7 @@ class PrometheusExporterApplication(Application):
         return Response(content_type='text/html', text=text)
 
     async def _handle_metrics(self, request):
-        '''Handler for metrics.'''
+        """Handler for metrics."""
         if self._update_handler:
             self._update_handler(get_registry_metrics(self.registry))
         body = generate_latest(self.registry)

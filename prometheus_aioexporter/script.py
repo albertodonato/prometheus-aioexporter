@@ -1,4 +1,4 @@
-'''Run a web server providing a Prometheus metrics endpoint.'''
+"""Run a web server providing a Prometheus metrics endpoint."""
 
 import sys
 import logging
@@ -17,7 +17,7 @@ from .web import PrometheusExporterApplication
 
 
 class PrometheusExporterScript(Script):
-    '''Expose metrics to Prometheus.'''
+    """Expose metrics to Prometheus."""
 
     # Name of the script, can be set by subsclasses.
     name = 'prometheus-exporter'
@@ -29,51 +29,51 @@ class PrometheusExporterScript(Script):
 
     @property
     def description(self):
-        '''Service description.
+        """Service description.
 
         By default, return the class docstring.
 
-        '''
+        """
         return self.__doc__ or ''
 
     @property
     def logger(self):
-        '''A logger for the script.'''
+        """A logger for the script."""
         return logging.getLogger(name=self.name)
 
     def configure_argument_parser(self, parser):
-        '''Add configuration to the ArgumentParser.
+        """Add configuration to the ArgumentParser.
 
         Subclasses can implement this to add options to the ArgumentParser for
         the script.
 
-        '''
+        """
 
     def on_application_startup(self, application):
-        '''Handler run at Application startup.
+        """Handler run at Application startup.
 
         Subclasses can implement this to perform operations as part of
         Application.on_startup handler.
 
-        '''
+        """
 
     def on_application_shutdown(self, application):
-        '''Handler run at Application shutdown.
+        """Handler run at Application shutdown.
 
         Subclasses can implement this to perform operations as part of
         Application.on_shutdown handler.
 
-        '''
+        """
 
     def configure(self, args):
-        '''Perform additional confguration steps at script startup.
+        """Perform additional confguration steps at script startup.
 
         Subclasses can implement this.
 
-        '''
+        """
 
     def create_metrics(self, metric_configs):
-        '''Create and register metrics from a list of MetricConfigs.'''
+        """Create and register metrics from a list of MetricConfigs."""
         return create_metrics(metric_configs, self.registry)
 
     def get_parser(self):
@@ -103,7 +103,7 @@ class PrometheusExporterScript(Script):
         self._run_application(args.host, args.port, app)
 
     def _setup_logging(self, log_level):
-        '''Setup logging for the application and aiohttp.'''
+        """Setup logging for the application and aiohttp."""
         level = getattr(logging, log_level)
         names = (
             'aiohttp.access', 'aiohttp.internal', 'aiohttp.server',
@@ -112,12 +112,12 @@ class PrometheusExporterScript(Script):
             setup_logger(name=name, stream=sys.stderr, level=level)
 
     def _configure_registry(self, include_process_stats=False):
-        '''Return a metrics registry.'''
+        """Return a metrics registry."""
         if include_process_stats:
             ProcessCollector(registry=self.registry)
 
     def _create_application(self, args):
-        '''Create the application to export metrics.'''
+        """Create the application to export metrics."""
         app = PrometheusExporterApplication(
             self.name, self.description, args.host, args.port, self.registry)
         app.on_startup.append(self.on_application_startup)
@@ -125,7 +125,7 @@ class PrometheusExporterScript(Script):
         return app
 
     def _run_application(self, host, port, application):
-        '''Run the application on the specified host and port.'''
+        """Run the application on the specified host and port."""
         web.run_app(
             application, host=host, port=port,
             print=lambda *args, **kargs: None,

@@ -28,7 +28,7 @@ from prometheus_aioexporter.script import PrometheusExporterScript
 
 
 class MyExporter(PrometheusExporterScript):
-    '''My Prometheus exporter.'''
+    """My Prometheus exporter."""
 
     def configure_argument_parser(self, parser):
         # Additional arguments to the script

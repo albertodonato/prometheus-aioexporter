@@ -1,4 +1,4 @@
-'''Helpers around prometheus-client to create and register metrics.'''
+"""Helpers around prometheus-client to create and register metrics."""
 
 from collections import namedtuple
 
@@ -28,7 +28,7 @@ METRIC_TYPES = {
 
 class MetricConfig(namedtuple(
         'MetricConfig', ['name', 'description', 'type', 'config'])):
-    '''Configuration for a metric.'''
+    """Configuration for a metric."""
 
     def __new__(cls, name, description, typ, config):
         if typ not in METRIC_TYPES:
@@ -37,7 +37,7 @@ class MetricConfig(namedtuple(
 
 
 class InvalidMetricType(Exception):
-    '''Raised when invalid metric type is found.'''
+    """Raised when invalid metric type is found."""
 
     def __init__(self, name, invalid_type):
         self.name = name
@@ -48,21 +48,21 @@ class InvalidMetricType(Exception):
 
 
 def create_metrics(configs, registry):
-    '''Create and register Prometheus metrics from a list of MetricConfigs.'''
+    """Create and register Prometheus metrics from a list of MetricConfigs."""
     return {
         config.name: _register_metric(config, registry)
         for config in configs}
 
 
 def get_registry_metrics(registry):
-    '''Return a dict with metrics to metrics from a CollectorRegistry.'''
+    """Return a dict with metrics to metrics from a CollectorRegistry."""
     return {
         metric.describe()[0].name: metric
         for metric in registry._collector_to_names}
 
 
 def _register_metric(config, registry):
-    '''Register and return a Prometheus metric.'''
+    """Register and return a Prometheus metric."""
     metric_info = METRIC_TYPES[config.type]
     options = {
         metric_info['options'][key]: value
