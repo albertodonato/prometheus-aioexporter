@@ -119,8 +119,7 @@ class PrometheusExporterScript(Script):
     def _create_application(self, args):
         '''Create the application to export metrics.'''
         app = PrometheusExporterApplication(
-            self.name, self.description, args.host, args.port, self.registry,
-            loop=self.loop)
+            self.name, self.description, args.host, args.port, self.registry)
         app.on_startup.append(self.on_application_startup)
         app.on_shutdown.append(self.on_application_shutdown)
         return app
