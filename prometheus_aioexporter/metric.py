@@ -55,10 +55,13 @@ def create_metrics(configs, registry):
 
 
 def get_registry_metrics(registry):
-    """Return a dict with metrics to metrics from a CollectorRegistry."""
-    return {
-        metric.describe()[0].name: metric
-        for metric in registry._collector_to_names}
+    """Return a dict mapping names to metrics from a CollectorRegistry."""
+    metrics = {}
+    for collector in registry._collector_to_names:
+        if hasattr(collector, 'describe'):
+            metrics.update(
+                (metric.name, collector) for metric in collector.describe())
+    return metrics
 
 
 def _register_metric(config, registry):

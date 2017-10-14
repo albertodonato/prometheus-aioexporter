@@ -63,3 +63,17 @@ class GetRegistryMetricsTests(TestCase):
         metric2 = Histogram('metric2', 'A test histogram', registry=registry)
         metrics = get_registry_metrics(registry)
         self.assertEqual(metrics, {'metric1': metric1, 'metric2': metric2})
+
+    def test_collector_without_describe(self):
+        """Collectors without a describe() method are skipped."""
+
+        class SampleCollector:
+
+            def __init__(self, registry):
+                registry.register(self)
+
+        registry = CollectorRegistry()
+        metric1 = Gauge('metric1', 'A test gauge', registry=registry)
+        SampleCollector(registry)
+        metrics = get_registry_metrics(registry)
+        self.assertEqual(metrics, {'metric1': metric1})
