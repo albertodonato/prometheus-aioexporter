@@ -1,3 +1,8 @@
+# 1.0.2 - 2017-10-15
+
+* Fix error from `get_registry_metrics` when the registry has collectors
+  without a `describe()` method.
+
 # 1.0.1 - 2017-05-20
 
 * Fix aiohttp warning because of passing loop to the application.
