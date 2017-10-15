@@ -76,7 +76,7 @@ class PrometheusExporterScriptTests(LoopTestCase):
         # process stats are present in the registry
         self.assertIn(
             'process_cpu_seconds_total',
-            self.script.registry._names_to_collectors)
+            self.script.registry.registry._names_to_collectors)
 
     def test_create_application_registers_handlers(self):
         """Startup/shutdown handlers are registered with the application."""

@@ -7,12 +7,12 @@ import asyncio
 
 from aiohttp import web
 
-from prometheus_client import CollectorRegistry, ProcessCollector
+from prometheus_client import ProcessCollector
 
 from toolrack.script import Script
 from toolrack.log import setup_logger
 
-from .metric import create_metrics
+from .metric import MetricsRegistry
 from .web import PrometheusExporterApplication
 
 
@@ -25,7 +25,7 @@ class PrometheusExporterScript(Script):
     def __init__(self, stdout=None, stderr=None, loop=None):
         super().__init__(stdout=stdout, stderr=stderr)
         self.loop = loop or asyncio.get_event_loop()
-        self.registry = CollectorRegistry(auto_describe=True)
+        self.registry = MetricsRegistry()
 
     @property
     def description(self):
@@ -74,7 +74,7 @@ class PrometheusExporterScript(Script):
 
     def create_metrics(self, metric_configs):
         """Create and register metrics from a list of MetricConfigs."""
-        return create_metrics(metric_configs, self.registry)
+        return self.registry.create_metrics(metric_configs)
 
     def get_parser(self):
         parser = argparse.ArgumentParser(
@@ -112,9 +112,10 @@ class PrometheusExporterScript(Script):
             setup_logger(name=name, stream=sys.stderr, level=level)
 
     def _configure_registry(self, include_process_stats=False):
-        """Return a metrics registry."""
+        """Configure the MetricRegistry."""
         if include_process_stats:
-            ProcessCollector(registry=self.registry)
+            self.registry.register_additional_collector(
+                ProcessCollector(registry=None))
 
     def _create_application(self, args):
         """Create the application to export metrics."""

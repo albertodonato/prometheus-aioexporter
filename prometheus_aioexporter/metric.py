@@ -2,7 +2,12 @@
 
 from collections import namedtuple
 
-from prometheus_client import Counter, Gauge, Histogram, Summary
+from prometheus_client import (
+    CollectorRegistry,
+    Counter,
+    Gauge,
+    Histogram,
+    Summary)
 
 
 # Map metric types to classes and allowed options
@@ -47,29 +52,39 @@ class InvalidMetricType(Exception):
                 self.name, ', '.join(sorted(METRIC_TYPES))))
 
 
-def create_metrics(configs, registry):
-    """Create and register Prometheus metrics from a list of MetricConfigs."""
-    return {
-        config.name: _register_metric(config, registry)
-        for config in configs}
+class MetricsRegistry:
+    """A registry for metrics."""
 
+    def __init__(self):
+        self.registry = CollectorRegistry(auto_describe=True)
+        self._metrics = {}
 
-def get_registry_metrics(registry):
-    """Return a dict mapping names to metrics from a CollectorRegistry."""
-    metrics = {}
-    for collector in registry._collector_to_names:
-        if hasattr(collector, 'describe'):
-            metrics.update(
-                (metric.name, collector) for metric in collector.describe())
-    return metrics
+    def create_metrics(self, configs):
+        """Create Prometheus metrics from a list of MetricConfigs."""
+        metrics = {
+            config.name: self._register_metric(config)
+            for config in configs}
+        self._metrics.update(metrics)
+        return metrics
 
+    def get_metrics(self):
+        """Return a dict mapping names to metrics."""
+        return self._metrics.copy()
 
-def _register_metric(config, registry):
-    """Register and return a Prometheus metric."""
-    metric_info = METRIC_TYPES[config.type]
-    options = {
-        metric_info['options'][key]: value
-        for key, value in config.config.items()
-        if key in metric_info['options']}
-    return metric_info['class'](
-        config.name, config.description, registry=registry, **options)
+    def register_additional_collector(self, collector):
+        """Registrer an additional collector or metric.
+
+        Metric(s) for the collector will not be include in the result of
+        get_metrics.
+
+        """
+        self.registry.register(collector)
+
+    def _register_metric(self, config):
+        metric_info = METRIC_TYPES[config.type]
+        options = {
+            metric_info['options'][key]: value
+            for key, value in config.config.items()
+            if key in metric_info['options']}
+        return metric_info['class'](
+            config.name, config.description, registry=self.registry, **options)
