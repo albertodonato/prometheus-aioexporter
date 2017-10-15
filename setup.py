@@ -1,6 +1,11 @@
-from setuptools import setup, find_packages
+from setuptools import (
+    setup,
+    find_packages)
 
-from prometheus_aioexporter import __version__, __doc__ as description
+from prometheus_aioexporter import (
+    __version__,
+    __doc__ as description)
+
 
 config = {
     'name': 'prometheus-aioexporter',
