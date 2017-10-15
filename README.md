@@ -94,7 +94,7 @@ parsed argument (an `argparse.Namespace` instance).
 ### Metrics configuration
 
 The metrics exported by the script can be set up by calling `create_metrics`
-with a list of `MetricConfig`s. This is typically done in `configure()`
+with a list of `MetricConfig`s. This is typically done in `configure()`:
 
 ```python
 def configure(self, args):
