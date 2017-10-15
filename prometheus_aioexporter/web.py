@@ -6,9 +6,7 @@ from aiohttp.web import (
     Application,
     Response)
 
-from prometheus_client import (
-    generate_latest,
-    CONTENT_TYPE_LATEST)
+from prometheus_client import CONTENT_TYPE_LATEST
 
 
 class PrometheusExporterApplication(Application):
@@ -71,7 +69,6 @@ class PrometheusExporterApplication(Application):
         """Handler for metrics."""
         if self._update_handler:
             self._update_handler(self.registry.get_metrics())
-        body = generate_latest(self.registry.registry)
-        response = Response(body=body)
+        response = Response(body=self.registry.generate_metrics())
         response.content_type = CONTENT_TYPE_LATEST
         return response

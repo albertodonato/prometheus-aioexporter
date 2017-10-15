@@ -55,3 +55,12 @@ class MetricsRegistryTests(TestCase):
             [MetricConfig('metric1', 'A test gauge', 'gauge', {}),
              MetricConfig('metric2', 'A test histogram', 'histogram', {})])
         self.assertEqual(self.registry.get_metrics(), metrics)
+
+    def test_generate_metrics(self):
+        """generate_metrics returns text with metrics values."""
+        metrics = self.registry.create_metrics(
+            [MetricConfig('test_gauge', 'A test gauge', 'gauge', {})])
+        metrics['test_gauge'].set(12.3)
+        text = self.registry.generate_metrics().decode('utf-8')
+        self.assertIn('HELP test_gauge A test gauge', text)
+        self.assertIn('test_gauge 12.3', text)

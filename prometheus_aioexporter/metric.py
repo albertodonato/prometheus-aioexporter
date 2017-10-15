@@ -7,7 +7,8 @@ from prometheus_client import (
     Counter,
     Gauge,
     Histogram,
-    Summary)
+    Summary,
+    generate_latest)
 
 
 # Map metric types to classes and allowed options
@@ -79,6 +80,10 @@ class MetricsRegistry:
 
         """
         self.registry.register(collector)
+
+    def generate_metrics(self):
+        """Generate text with metrics values from the registry."""
+        return generate_latest(self.registry)
 
     def _register_metric(self, config):
         metric_info = METRIC_TYPES[config.type]
