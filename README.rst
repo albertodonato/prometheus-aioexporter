@@ -39,7 +39,7 @@ An example usage is the following:
             # Save attributes that are needed for later
             self.data = do_stuff()
             # ...
-        
+
         def on_application_startup(self, application):
             # Start other asyncio tasks at application startup
             use(self.data)
@@ -49,7 +49,7 @@ An example usage is the following:
             # Stop other asyncio tasks at application shutdown
             use(self.data)
             # ...
-            
+
 
     script = MyExporter()
 
