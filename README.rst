@@ -59,7 +59,7 @@ Exporter command-line
 
 ``PrometheusExporterScript`` provides a few command-line arguments by default:
 
-.. code:: python
+.. code::
 
     optional arguments:
       -h, --help            show this help message and exit
@@ -98,7 +98,7 @@ Metrics configuration
 ~~~~~~~~~~~~~~~~~~~~~
 
 The metrics exported by the script can be set up by calling ``create_metrics``
-with a list of ``MetricConfig``'s. This is typically done in ``configure()``:
+with a list of ``MetricConfig``\s. This is typically done in ``configure()``:
 
 .. code:: python
 
