@@ -1,5 +1,7 @@
 from unittest import TestCase
 
+from prometheus_client.core import _LabelWrapper
+
 from ..metric import (
     MetricConfig,
     InvalidMetricType,
@@ -55,6 +57,25 @@ class MetricsRegistryTests(TestCase):
             [MetricConfig('metric1', 'A test gauge', 'gauge', {}),
              MetricConfig('metric2', 'A test histogram', 'histogram', {})])
         self.assertEqual(self.registry.get_metrics(), metrics)
+
+    def test_get_metric(self):
+        """get_metric returns a metric."""
+        configs = [
+            MetricConfig(
+                'm', 'A test gauge', 'gauge', {'labels': ['l1', 'l2']})]
+        self.registry.create_metrics(configs)
+        metric = self.registry.get_metric('m')
+        self.assertEqual(metric._name, 'm')
+        self.assertIsInstance(metric, _LabelWrapper)
+
+    def test_get_metric_with_labels(self):
+        """get_metric returns a metric configured with labels."""
+        configs = [
+            MetricConfig(
+                'm', 'A test gauge', 'gauge', {'labels': ['l1', 'l2']})]
+        self.registry.create_metrics(configs)
+        metric = self.registry.get_metric('m', {'l1': 'v1', 'l2': 'v2'})
+        self.assertFalse(isinstance(metric, _LabelWrapper))
 
     def test_generate_metrics(self):
         """generate_metrics returns text with metrics values."""

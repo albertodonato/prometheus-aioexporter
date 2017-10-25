@@ -68,6 +68,14 @@ class MetricsRegistry:
         self._metrics.update(metrics)
         return metrics
 
+    def get_metric(self, name, labels=None):
+        """Return a metric, optionally configured with labels."""
+        metric = self._metrics[name]
+        if labels:
+            return metric.labels(**labels)
+
+        return metric
+
     def get_metrics(self):
         """Return a dict mapping names to metrics."""
         return self._metrics.copy()
