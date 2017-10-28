@@ -1,3 +1,10 @@
+1.2.0 - 2017-10-28
+==================
+
+- Add ``MetricsRegistry.get_metric`` to return a single metric, possibly
+  configured with label values.
+
+
 1.1.0 - 2017-10-25
 ==================
 
