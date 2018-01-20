@@ -55,7 +55,7 @@ class PrometheusExporterApplicationTests(AioHTTPTestCase):
         """set_metric_update_handler sets a handler called with metrics."""
         args = []
 
-        def update_handler(metrics):
+        async def update_handler(metrics):
             args.append(metrics)
 
         self.app.set_metric_update_handler(update_handler)

@@ -120,9 +120,10 @@ implementing the ``on_application_startup`` and ``on_application_shutdown``
 methods, which are called with the application instance.
 
 This is a ``PrometheusExporterApplication`` instance, which provides a
-hook to update metrics on each request, before the response is returned
-to the client. This is called with a dict mapping metric names to
-metrics.
+``set_metric_update_handler`` method to register a hook to update metrics on
+each request, before the response is returned to the client. The registered
+function must return a coroutine and is called with a dict mapping metric
+names to metric objects:
 
 .. code:: python
 
@@ -130,7 +131,7 @@ metrics.
         # ...
         application.set_metric_update_handler(self._update_handler)
 
-    def _update_handler(self, metrics):
+    async def _update_handler(self, metrics):
         for name, metric in metrics.items():
             metric.set(...)
 

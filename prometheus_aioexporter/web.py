@@ -27,8 +27,11 @@ class PrometheusExporterApplication(Application):
     def set_metric_update_handler(self, handler):
         """Set a handler to update metrics.
 
-        The provided function is called at every request with a dict as
-        argument, mapping metric names to metrics.
+        The provided asynchronous function is called at every request with a
+        dict as argument, mapping metric names to metrics.  The signature is
+        the following:
+
+          async def update_handler(metrics)
 
         """
         self._update_handler = handler
@@ -68,7 +71,7 @@ class PrometheusExporterApplication(Application):
     async def _handle_metrics(self, request):
         """Handler for metrics."""
         if self._update_handler:
-            self._update_handler(self.registry.get_metrics())
+            await self._update_handler(self.registry.get_metrics())
         response = Response(body=self.registry.generate_metrics())
         response.content_type = CONTENT_TYPE_LATEST
         return response
