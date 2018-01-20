@@ -1,5 +1,13 @@
-1.2.0 - 2017-10-28
+1.3.0 - 2018-01-20
 ==================
+
+- The function passed to
+  ``PrometheusExporterApplication.set_metric_update_handler`` must now be
+  awaitable.
+
+
+1.2.0 - 2017-10-28
+ ==================
 
 - Add ``MetricsRegistry.get_metric`` to return a single metric, possibly
   configured with label values.
