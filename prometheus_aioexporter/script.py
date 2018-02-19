@@ -5,15 +5,13 @@ import logging
 import argparse
 import asyncio
 
-from aiohttp import web
-
 from prometheus_client import ProcessCollector
 
 from toolrack.script import Script
 from toolrack.log import setup_logger
 
 from .metric import MetricsRegistry
-from .web import PrometheusExporterApplication
+from .web import PrometheusExporter
 
 
 class PrometheusExporterScript(Script):
@@ -49,16 +47,20 @@ class PrometheusExporterScript(Script):
 
         """
 
-    def on_application_startup(self, application):
+    async def on_application_startup(self, application):
         """Handler run at Application startup.
+
+        This must be a coroutine.
 
         Subclasses can implement this to perform operations as part of
         Application.on_startup handler.
 
         """
 
-    def on_application_shutdown(self, application):
+    async def on_application_shutdown(self, application):
         """Handler run at Application shutdown.
+
+        This must be a coroutine.
 
         Subclasses can implement this to perform operations as part of
         Application.on_shutdown handler.
@@ -99,8 +101,8 @@ class PrometheusExporterScript(Script):
         self._setup_logging(args.log_level)
         self._configure_registry(include_process_stats=args.process_stats)
         self.configure(args)
-        app = self._create_application(args)
-        self._run_application(args.host, args.port, app)
+        exporter = self._get_exporter(args)
+        exporter.run()
 
     def _setup_logging(self, log_level):
         """Setup logging for the application and aiohttp."""
@@ -117,17 +119,10 @@ class PrometheusExporterScript(Script):
             self.registry.register_additional_collector(
                 ProcessCollector(registry=None))
 
-    def _create_application(self, args):
-        """Create the application to export metrics."""
-        app = PrometheusExporterApplication(
+    def _get_exporter(self, args):
+        """Return a :class:`PrometheusExporter` configured with args."""
+        exporter = PrometheusExporter(
             self.name, self.description, args.host, args.port, self.registry)
-        app.on_startup.append(self.on_application_startup)
-        app.on_shutdown.append(self.on_application_shutdown)
-        return app
-
-    def _run_application(self, host, port, application):
-        """Run the application on the specified host and port."""
-        web.run_app(
-            application, host=host, port=port,
-            print=lambda *args, **kargs: None,
-            access_log_format='%a "%r" %s %b "%{Referrer}i" "%{User-Agent}i"')
+        exporter.app.on_startup.append(self.on_application_startup)
+        exporter.app.on_shutdown.append(self.on_application_shutdown)
+        return exporter

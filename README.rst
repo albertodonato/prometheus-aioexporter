@@ -40,12 +40,12 @@ An example usage is the following:
             self.data = do_stuff()
             # ...
 
-        def on_application_startup(self, application):
+        async def on_application_startup(self, application):
             # Start other asyncio tasks at application startup
             use(self.data)
             # ...
 
-        def on_application_shutdown(self, application):
+        async def on_application_shutdown(self, application):
             # Stop other asyncio tasks at application shutdown
             use(self.data)
             # ...
@@ -112,22 +112,22 @@ with a list of ``MetricConfig``\s. This is typically done in ``configure()``:
 Web application setup
 ~~~~~~~~~~~~~~~~~~~~~
 
-On startup, ``PrometheusExporterScript`` creates a web application which is
-used to expose metrics.
+On startup, ``PrometheusExporterScript`` creates a ``PrometheusExporter`` which
+includes a web application that exposes metrics.
 
 It's possible to customize and perform additional startup/shutdown tasks by
 implementing the ``on_application_startup`` and ``on_application_shutdown``
-methods, which are called with the application instance.
+coroutine methods, which are called with the application as parameter.
 
-This is a ``PrometheusExporterApplication`` instance, which provides a
-``set_metric_update_handler`` method to register a hook to update metrics on
-each request, before the response is returned to the client. The registered
-function must return a coroutine and is called with a dict mapping metric
-names to metric objects:
+The ``PrometheusExporter`` instance is accessible via
+``application['exporter']``), and provides a ``set_metric_update_handler``
+method to register a hook to update metrics on each request, before the
+response is returned to the client.  The registered function must return a
+coroutine and is called with a dict mapping metric names to metric objects:
 
 .. code:: python
 
-    def on_application_startup(self, application):
+    async def on_application_startup(self, application):
         # ...
         application.set_metric_update_handler(self._update_handler)
 

@@ -57,9 +57,9 @@ class PrometheusExporterScriptTests(LoopTestCase):
         self.assertEqual(metrics['m2']._type, 'histogram')
 
     @mock.patch('prometheus_aioexporter.script.setup_logger')
-    def test_setup_logging(self, mock_setup_logger):
+    @mock.patch('prometheus_aioexporter.web.PrometheusExporter.run')
+    def test_setup_logging(self, mock_exporter_run, mock_setup_logger):
         """Logging is set up."""
-        self.script._run_application = lambda *args: None
         self.script([])
         logger_names = (
             'aiohttp.access', 'aiohttp.internal', 'aiohttp.server',
@@ -69,27 +69,27 @@ class PrometheusExporterScriptTests(LoopTestCase):
             for name in logger_names]
         mock_setup_logger.assert_has_calls(calls)
 
-    def test_include_process_stats(self):
+    @mock.patch('prometheus_aioexporter.web.PrometheusExporter.run')
+    def test_include_process_stats(self, mock_exporter_run):
         """The script can include process stats in metrics."""
-        self.script._run_application = lambda *args: None
         self.script(['--process-stats'])
         # process stats are present in the registry
         self.assertIn(
             'process_cpu_seconds_total',
             self.script.registry.registry._names_to_collectors)
 
-    def test_create_application_registers_handlers(self):
+    def test_get_exporter_registers_handlers(self):
         """Startup/shutdown handlers are registered with the application."""
         args = self.script.get_parser().parse_args([])
-        application = self.script._create_application(args)
+        exporter = self.script._get_exporter(args)
         self.assertIn(
-            self.script.on_application_startup, application.on_startup)
+            self.script.on_application_startup, exporter.app.on_startup)
         self.assertIn(
-            self.script.on_application_shutdown, application.on_shutdown)
+            self.script.on_application_shutdown, exporter.app.on_shutdown)
 
-    @mock.patch('prometheus_aioexporter.script.web.run_app')
-    def test_run_application(self, mock_run_app):
-        """The script starts the web application."""
+    @mock.patch('prometheus_aioexporter.web.run_app')
+    def test_script_run_exporter(self, mock_run_app):
+        """The script runs the exporter application."""
         self.script([])
         mock_run_app.assert_called_with(
             mock.ANY, host='localhost', port=9090, print=mock.ANY,

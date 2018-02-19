@@ -1,3 +1,5 @@
+from unittest import mock
+
 from aiohttp.test_utils import (
     AioHTTPTestCase,
     unittest_run_loop)
@@ -5,18 +7,31 @@ from aiohttp.test_utils import (
 from ..metric import (
     MetricsRegistry,
     MetricConfig)
-from ..web import PrometheusExporterApplication
+from ..web import PrometheusExporter
 
 
-class PrometheusExporterApplicationTests(AioHTTPTestCase):
+class PrometheusExporterTests(AioHTTPTestCase):
 
     def setUp(self):
         self.registry = MetricsRegistry()
+        self.exporter = PrometheusExporter(
+            'test-app', 'A test application', 'localhost', 8000, self.registry)
         super().setUp()
 
     async def get_application(self):
-        return PrometheusExporterApplication(
-            'test-app', 'A test application', 'localhost', 8000, self.registry)
+        return self.exporter.app
+
+    def test_app_exporter_reference(self):
+        """The application has a reference to the exporter."""
+        self.assertIs(self.app['exporter'], self.exporter)
+
+    @mock.patch('prometheus_aioexporter.web.run_app')
+    def test_run(self, mock_run_app):
+        """The script starts the web application."""
+        self.exporter.run()
+        mock_run_app.assert_called_with(
+            mock.ANY, host='localhost', port=8000, print=mock.ANY,
+            access_log_format='%a "%r" %s %b "%{Referrer}i" "%{User-Agent}i"')
 
     @unittest_run_loop
     async def test_homepage(self):
@@ -30,7 +45,7 @@ class PrometheusExporterApplicationTests(AioHTTPTestCase):
     @unittest_run_loop
     async def test_homepage_no_description(self):
         """The title is set to just the name if no descrption is present."""
-        self.app.description = None
+        self.exporter.description = None
         request = await self.client.request('GET', '/')
         self.assertEqual(request.status, 200)
         self.assertEqual(request.content_type, 'text/html')
@@ -58,7 +73,7 @@ class PrometheusExporterApplicationTests(AioHTTPTestCase):
         async def update_handler(metrics):
             args.append(metrics)
 
-        self.app.set_metric_update_handler(update_handler)
+        self.exporter.set_metric_update_handler(update_handler)
         metrics = self.registry.create_metrics(
             [MetricConfig('metric1', 'A test gauge', 'gauge', {}),
              MetricConfig('metric2', 'A test histogram', 'histogram', {})])
