@@ -1,9 +1,20 @@
+1.3.0 - 2018-02-20
+==================
+
+- Updates to support aiohttp 3.0.x.
+- Rename ``PrometheusExporterApplication`` to ``PrometheusExporter``, which
+  contains a ``web.Application`` rather than extending it.
+- The function passed to
+  ``PrometheusExporterScript.on_application_[startup|shutdown]`` must now be
+  coroutines.
+
+
 1.3.0 - 2018-01-20
 ==================
 
 - The function passed to
   ``PrometheusExporterApplication.set_metric_update_handler`` must now be
-  awaitable.
+  coroutines.
 
 
 1.2.0 - 2017-10-28
