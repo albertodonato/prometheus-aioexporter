@@ -24,7 +24,7 @@ config = {
     'install_requires': [
         'aiohttp >= 3.0.0',
         'prometheus-client',
-        'toolrack'],
+        'toolrack >= 2.0.1'],
     'tests_require': ['asynctest'],
     'keywords': 'prometheus exporter library',
     'classifiers': [
@@ -34,8 +34,7 @@ config = {
         ('License :: OSI Approved :: '
          'GNU Lesser General Public License v3 or later (LGPLv3+)'),
         'Operating System :: POSIX :: Linux',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3 :: Only',
         'Topic :: Utilities',
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules']}
