@@ -1,6 +1,17 @@
 language: python
 python:
+  - "3.5"
   - "3.6"
+matrix:
+  fast_finish: true
+stages:
+  - lint
+  - test
 install: pip install tox codecov
-script: tox -e lint,coverage
+jobs:
+  include:
+    - stage: lint
+      script: tox -e lint
+      python: "3.6"
+script: tox -e coverage
 after_success: codecov
