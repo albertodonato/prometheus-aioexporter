@@ -10,6 +10,8 @@ from prometheus_aioexporter import (
 )
 
 
+tests_require = ['asynctest']
+
 config = {
     'name': 'prometheus-aioexporter',
     'version': __version__,
@@ -28,7 +30,8 @@ config = {
         'aiohttp >= 3.0.0',
         'prometheus-client',
         'toolrack >= 2.0.1'],
-    'tests_require': ['asynctest'],
+    'tests_require': tests_require,
+    'extras_require': {'testing': tests_require},
     'keywords': 'prometheus exporter library',
     'classifiers': [
         'Development Status :: 4 - Beta',

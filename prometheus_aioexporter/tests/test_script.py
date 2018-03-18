@@ -2,7 +2,7 @@ from unittest import mock
 from io import StringIO
 import logging
 
-from toolrack.testing.async import LoopTestCase
+from asynctest import TestCase
 
 from ..script import PrometheusExporterScript
 from ..metric import MetricConfig
@@ -14,7 +14,7 @@ class SampleScript(PrometheusExporterScript):
     name = 'sample-script'
 
 
-class PrometheusExporterScriptTests(LoopTestCase):
+class PrometheusExporterScriptTests(TestCase):
 
     def setUp(self):
         super().setUp()
