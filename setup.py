@@ -29,7 +29,7 @@ config = {
     'install_requires': [
         'aiohttp >= 3.0.0',
         'prometheus-client',
-        'toolrack >= 2.0.1'],
+        'toolrack >= 2.1.0'],
     'tests_require': tests_require,
     'extras_require': {'testing': tests_require},
     'keywords': 'prometheus exporter library',
