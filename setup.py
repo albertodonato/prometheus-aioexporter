@@ -10,7 +10,7 @@ from prometheus_aioexporter import (
     __version__,
 )
 
-tests_require = ['asynctest']
+tests_require = ['pytest', 'pytest-aiohttp', 'pytest-mock']
 
 config = {
     'name': 'prometheus-aioexporter',

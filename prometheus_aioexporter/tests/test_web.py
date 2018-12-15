@@ -1,9 +1,6 @@
 from unittest import mock
 
-from aiohttp.test_utils import (
-    AioHTTPTestCase,
-    unittest_run_loop,
-)
+import pytest
 
 from ..metric import (
     MetricConfig,
@@ -12,25 +9,27 @@ from ..metric import (
 from ..web import PrometheusExporter
 
 
-class PrometheusExporterTests(AioHTTPTestCase):
+@pytest.fixture
+def registry():
+    yield MetricsRegistry()
 
-    def setUp(self):
-        self.registry = MetricsRegistry()
-        self.exporter = PrometheusExporter(
-            'test-app', 'A test application', 'localhost', 8000, self.registry)
-        super().setUp()
 
-    async def get_application(self):
-        return self.exporter.app
+@pytest.fixture
+def exporter(registry):
+    yield PrometheusExporter(
+        'test-app', 'A test application', 'localhost', 8000, registry)
 
-    def test_app_exporter_reference(self):
+
+class TestPrometheusExporter:
+
+    def test_app_exporter_reference(self, exporter):
         """The application has a reference to the exporter."""
-        self.assertIs(self.app['exporter'], self.exporter)
+        assert exporter.app['exporter'] is exporter
 
-    @mock.patch('prometheus_aioexporter.web.run_app')
-    def test_run(self, mock_run_app):
+    def test_run(self, mocker, exporter):
         """The script starts the web application."""
-        self.exporter.run()
+        mock_run_app = mocker.patch('prometheus_aioexporter.web.run_app')
+        exporter.run()
         mock_run_app.assert_called_with(
             mock.ANY,
             host='localhost',
@@ -38,51 +37,52 @@ class PrometheusExporterTests(AioHTTPTestCase):
             print=mock.ANY,
             access_log_format='%a "%r" %s %b "%{Referrer}i" "%{User-Agent}i"')
 
-    @unittest_run_loop
-    async def test_homepage(self):
+    async def test_homepage(self, test_client, exporter):
         """The homepage shows an HTML page."""
-        request = await self.client.request('GET', '/')
-        self.assertEqual(request.status, 200)
-        self.assertEqual(request.content_type, 'text/html')
+        client = await test_client(exporter.app)
+        request = await client.request('GET', '/')
+        assert request.status == 200
+        assert request.content_type == 'text/html'
         text = await request.text()
-        self.assertIn('<title>test-app - A test application</title>', text)
+        assert '<title>test-app - A test application</title>' in text
 
-    @unittest_run_loop
-    async def test_homepage_no_description(self):
+    async def test_homepage_no_description(self, test_client, exporter):
         """The title is set to just the name if no descrption is present."""
-        self.exporter.description = None
-        request = await self.client.request('GET', '/')
-        self.assertEqual(request.status, 200)
-        self.assertEqual(request.content_type, 'text/html')
+        exporter.description = None
+        client = await test_client(exporter.app)
+        request = await client.request('GET', '/')
+        assert request.status == 200
+        assert request.content_type == 'text/html'
         text = await request.text()
-        self.assertIn('<title>test-app</title>', text)
+        assert '<title>test-app</title>' in text
 
-    @unittest_run_loop
-    async def test_metrics(self):
+    async def test_metrics(self, test_client, exporter, registry):
         """The /metrics page display Prometheus metrics."""
-        metrics = self.registry.create_metrics(
+        metrics = registry.create_metrics(
             [MetricConfig('test_gauge', 'A test gauge', 'gauge', {})])
         metrics['test_gauge'].set(12.3)
-        request = await self.client.request('GET', '/metrics')
-        self.assertEqual(request.status, 200)
-        self.assertEqual(request.content_type, 'text/plain')
+        client = await test_client(exporter.app)
+        request = await client.request('GET', '/metrics')
+        assert request.status == 200
+        assert request.content_type == 'text/plain'
         text = await request.text()
-        self.assertIn('HELP test_gauge A test gauge', text)
-        self.assertIn('test_gauge 12.3', text)
+        assert 'HELP test_gauge A test gauge' in text
+        assert 'test_gauge 12.3' in text
 
-    @unittest_run_loop
-    async def test_metrics_update_handler(self):
+    async def test_metrics_update_handler(
+            self, test_client, exporter, registry):
         """set_metric_update_handler sets a handler called with metrics."""
         args = []
 
         async def update_handler(metrics):
             args.append(metrics)
 
-        self.exporter.set_metric_update_handler(update_handler)
-        metrics = self.registry.create_metrics(
+        exporter.set_metric_update_handler(update_handler)
+        metrics = registry.create_metrics(
             [
                 MetricConfig('metric1', 'A test gauge', 'gauge', {}),
                 MetricConfig('metric2', 'A test histogram', 'histogram', {})
             ])
-        await self.client.request('GET', '/metrics')
-        self.assertEqual(args, [metrics])
+        client = await test_client(exporter.app)
+        await client.request('GET', '/metrics')
+        assert args == [metrics]
