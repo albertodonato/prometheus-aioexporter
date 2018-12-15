@@ -6,34 +6,43 @@ from prometheus_client import (
     CollectorRegistry,
     Counter,
     Gauge,
+    generate_latest,
     Histogram,
     Summary,
-    generate_latest)
-
+)
 
 # Map metric types to classes and allowed options
 METRIC_TYPES = {
     'counter': {
         'class': Counter,
         'options': {
-            'labels': 'labelnames'}},
+            'labels': 'labelnames'
+        }
+    },
     'gauge': {
         'class': Gauge,
         'options': {
-            'labels': 'labelnames'}},
+            'labels': 'labelnames'
+        }
+    },
     'histogram': {
         'class': Histogram,
         'options': {
             'labels': 'labelnames',
-            'buckets': 'buckets'}},
+            'buckets': 'buckets'
+        }
+    },
     'summary': {
         'class': Summary,
         'options': {
-            'labels': 'labelnames'}}}
+            'labels': 'labelnames'
+        }
+    }
+}
 
 
-class MetricConfig(namedtuple(
-        'MetricConfig', ['name', 'description', 'type', 'config'])):
+class MetricConfig(namedtuple('MetricConfig',
+                              ['name', 'description', 'type', 'config'])):
     """Configuration for a metric."""
 
     def __new__(cls, name, description, typ, config):
@@ -64,7 +73,8 @@ class MetricsRegistry:
         """Create Prometheus metrics from a list of MetricConfigs."""
         metrics = {
             config.name: self._register_metric(config)
-            for config in configs}
+            for config in configs
+        }
         self._metrics.update(metrics)
         return metrics
 
@@ -98,6 +108,7 @@ class MetricsRegistry:
         options = {
             metric_info['options'][key]: value
             for key, value in config.config.items()
-            if key in metric_info['options']}
+            if key in metric_info['options']
+        }
         return metric_info['class'](
             config.name, config.description, registry=self.registry, **options)

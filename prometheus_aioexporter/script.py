@@ -1,14 +1,13 @@
 """Run a web server providing a Prometheus metrics endpoint."""
 
-import sys
-import logging
 import argparse
 import asyncio
+import logging
+import sys
 
 from prometheus_client import ProcessCollector
-
-from toolrack.script import Script
 from toolrack.log import setup_logger
+from toolrack.script import Script
 
 from .metric import MetricsRegistry
 from .web import PrometheusExporter
@@ -85,14 +84,20 @@ class PrometheusExporterScript(Script):
         parser.add_argument(
             '-H', '--host', default='localhost', help='host address to bind')
         parser.add_argument(
-            '-p', '--port', type=int, default=9090,
+            '-p',
+            '--port',
+            type=int,
+            default=9090,
             help='port to run the webserver on')
         parser.add_argument(
-            '-L', '--log-level', default='WARNING',
+            '-L',
+            '--log-level',
+            default='WARNING',
             choices=['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'],
             help='minimum level for log messages')
         parser.add_argument(
-            '--process-stats', action='store_true',
+            '--process-stats',
+            action='store_true',
             help='include process stats in metrics')
         self.configure_argument_parser(parser)
         return parser

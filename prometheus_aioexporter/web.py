@@ -7,7 +7,6 @@ from aiohttp.web import (
     Response,
     run_app,
 )
-
 from prometheus_client import CONTENT_TYPE_LATEST
 
 
@@ -39,7 +38,9 @@ class PrometheusExporter:
     def run(self):
         """Run the :class:`aiohttp.web.Application` for the exporter."""
         run_app(
-            self.app, host=self.host, port=self.port,
+            self.app,
+            host=self.host,
+            port=self.port,
             print=lambda *args, **kargs: None,
             access_log_format='%a "%r" %s %b "%{Referrer}i" "%{User-Agent}i"')
 
@@ -64,7 +65,8 @@ class PrometheusExporter:
         else:
             title = self.name
 
-        text = dedent('''<!DOCTYPE html>
+        text = dedent(
+            '''<!DOCTYPE html>
           <html>
             <head>
               <title>{title}</title>

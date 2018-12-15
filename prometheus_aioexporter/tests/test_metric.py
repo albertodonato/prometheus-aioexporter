@@ -1,9 +1,10 @@
 from unittest import TestCase
 
 from ..metric import (
-    MetricConfig,
     InvalidMetricType,
-    MetricsRegistry)
+    MetricConfig,
+    MetricsRegistry,
+)
 
 
 class MetricConfigTests(TestCase):
@@ -28,7 +29,8 @@ class MetricsRegistryTests(TestCase):
         """Prometheus metrics are created from the specified config."""
         configs = [
             MetricConfig('m1', 'desc1', 'counter', {}),
-            MetricConfig('m2', 'desc2', 'histogram', {})]
+            MetricConfig('m2', 'desc2', 'histogram', {})
+        ]
         metrics = self.registry.create_metrics(configs)
         self.assertEqual(len(metrics), 2)
         self.assertEqual(metrics['m1']._type, 'counter')
@@ -37,30 +39,33 @@ class MetricsRegistryTests(TestCase):
     def test_create_metrics_with_config(self):
         """Metric configs are applied."""
         configs = [
-            MetricConfig('m1', 'desc1', 'histogram', {'buckets': [10, 20]})]
+            MetricConfig('m1', 'desc1', 'histogram', {'buckets': [10, 20]})
+        ]
         metrics = self.registry.create_metrics(configs)
         # The two specified bucket plus +Inf
         self.assertEqual(len(metrics['m1']._buckets), 3)
 
     def test_create_metrics_config_ignores_unknown(self):
         """Unknown metric configs are ignored and don't cause an error."""
-        configs = [
-            MetricConfig('m1', 'desc1', 'gauge', {'unknown': 'value'})]
+        configs = [MetricConfig('m1', 'desc1', 'gauge', {'unknown': 'value'})]
         metrics = self.registry.create_metrics(configs)
         self.assertEqual(len(metrics), 1)
 
     def test_get_metrics(self):
         """get_metrics returns a dict with metrics."""
         metrics = self.registry.create_metrics(
-            [MetricConfig('metric1', 'A test gauge', 'gauge', {}),
-             MetricConfig('metric2', 'A test histogram', 'histogram', {})])
+            [
+                MetricConfig('metric1', 'A test gauge', 'gauge', {}),
+                MetricConfig('metric2', 'A test histogram', 'histogram', {})
+            ])
         self.assertEqual(self.registry.get_metrics(), metrics)
 
     def test_get_metric(self):
         """get_metric returns a metric."""
         configs = [
             MetricConfig(
-                'm', 'A test gauge', 'gauge', {'labels': ['l1', 'l2']})]
+                'm', 'A test gauge', 'gauge', {'labels': ['l1', 'l2']})
+        ]
         self.registry.create_metrics(configs)
         metric = self.registry.get_metric('m')
         self.assertEqual(metric._name, 'm')
@@ -71,7 +76,8 @@ class MetricsRegistryTests(TestCase):
         """get_metric returns a metric configured with labels."""
         configs = [
             MetricConfig(
-                'm', 'A test gauge', 'gauge', {'labels': ['l1', 'l2']})]
+                'm', 'A test gauge', 'gauge', {'labels': ['l1', 'l2']})
+        ]
         self.registry.create_metrics(configs)
         metric = self.registry.get_metric('m', {'l1': 'v1', 'l2': 'v2'})
         self.assertEqual(metric._labelvalues, ('v1', 'v2'))

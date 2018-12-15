@@ -1,11 +1,11 @@
-from unittest import mock
 from io import StringIO
 import logging
+from unittest import mock
 
 from asynctest import TestCase
 
-from ..script import PrometheusExporterScript
 from ..metric import MetricConfig
+from ..script import PrometheusExporterScript
 
 
 class SampleScript(PrometheusExporterScript):
@@ -50,7 +50,8 @@ class PrometheusExporterScriptTests(TestCase):
         """Metrics are created based on the configuration."""
         configs = [
             MetricConfig('m1', 'desc1', 'counter', {}),
-            MetricConfig('m2', 'desc2', 'histogram', {})]
+            MetricConfig('m2', 'desc2', 'histogram', {})
+        ]
         metrics = self.script.create_metrics(configs)
         self.assertEqual(len(metrics), 2)
         self.assertEqual(metrics['m1']._type, 'counter')
@@ -66,7 +67,8 @@ class PrometheusExporterScriptTests(TestCase):
             'aiohttp.web', 'sample-script')
         calls = [
             mock.call(level=logging.WARNING, name=name, stream=mock.ANY)
-            for name in logger_names]
+            for name in logger_names
+        ]
         mock_setup_logger.assert_has_calls(calls)
 
     @mock.patch('prometheus_aioexporter.web.PrometheusExporter.run')
@@ -92,5 +94,8 @@ class PrometheusExporterScriptTests(TestCase):
         """The script runs the exporter application."""
         self.script([])
         mock_run_app.assert_called_with(
-            mock.ANY, host='localhost', port=9090, print=mock.ANY,
+            mock.ANY,
+            host='localhost',
+            port=9090,
+            print=mock.ANY,
             access_log_format='%a "%r" %s %b "%{Referrer}i" "%{User-Agent}i"')

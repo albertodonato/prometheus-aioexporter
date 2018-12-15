@@ -2,11 +2,13 @@ from unittest import mock
 
 from aiohttp.test_utils import (
     AioHTTPTestCase,
-    unittest_run_loop)
+    unittest_run_loop,
+)
 
 from ..metric import (
+    MetricConfig,
     MetricsRegistry,
-    MetricConfig)
+)
 from ..web import PrometheusExporter
 
 
@@ -30,7 +32,10 @@ class PrometheusExporterTests(AioHTTPTestCase):
         """The script starts the web application."""
         self.exporter.run()
         mock_run_app.assert_called_with(
-            mock.ANY, host='localhost', port=8000, print=mock.ANY,
+            mock.ANY,
+            host='localhost',
+            port=8000,
+            print=mock.ANY,
             access_log_format='%a "%r" %s %b "%{Referrer}i" "%{User-Agent}i"')
 
     @unittest_run_loop
@@ -75,7 +80,9 @@ class PrometheusExporterTests(AioHTTPTestCase):
 
         self.exporter.set_metric_update_handler(update_handler)
         metrics = self.registry.create_metrics(
-            [MetricConfig('metric1', 'A test gauge', 'gauge', {}),
-             MetricConfig('metric2', 'A test histogram', 'histogram', {})])
+            [
+                MetricConfig('metric1', 'A test gauge', 'gauge', {}),
+                MetricConfig('metric2', 'A test histogram', 'histogram', {})
+            ])
         await self.client.request('GET', '/metrics')
         self.assertEqual(args, [metrics])
