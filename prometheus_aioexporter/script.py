@@ -4,12 +4,24 @@ import argparse
 import asyncio
 import logging
 import sys
+from typing import (
+    ClassVar,
+    Dict,
+    Iterable,
+)
 
-from prometheus_client import ProcessCollector
+from aiohttp.web import Application
+from prometheus_client import (
+    Metric,
+    ProcessCollector,
+)
 from toolrack.log import setup_logger
 from toolrack.script import Script
 
-from .metric import MetricsRegistry
+from .metric import (
+    MetricConfig,
+    MetricsRegistry,
+)
 from .web import PrometheusExporter
 
 
@@ -17,7 +29,8 @@ class PrometheusExporterScript(Script):
     """Expose metrics to Prometheus."""
 
     # Name of the script, can be set by subsclasses.
-    name = 'prometheus-exporter'
+    name: ClassVar[str] = 'prometheus-exporter'
+    registry: MetricsRegistry
 
     def __init__(self, stdout=None, stderr=None, loop=None):
         super().__init__(stdout=stdout, stderr=stderr)
@@ -25,7 +38,7 @@ class PrometheusExporterScript(Script):
         self.registry = MetricsRegistry()
 
     @property
-    def description(self):
+    def description(self) -> str:
         """Service description.
 
         By default, return the class docstring.
@@ -34,11 +47,11 @@ class PrometheusExporterScript(Script):
         return self.__doc__ or ''
 
     @property
-    def logger(self):
+    def logger(self) -> logging.Logger:
         """A logger for the script."""
         return logging.getLogger(name=self.name)
 
-    def configure_argument_parser(self, parser):
+    def configure_argument_parser(self, parser: argparse.ArgumentParser):
         """Add configuration to the ArgumentParser.
 
         Subclasses can implement this to add options to the ArgumentParser for
@@ -46,7 +59,7 @@ class PrometheusExporterScript(Script):
 
         """
 
-    async def on_application_startup(self, application):
+    async def on_application_startup(self, application: Application):
         """Handler run at Application startup.
 
         This must be a coroutine.
@@ -56,7 +69,7 @@ class PrometheusExporterScript(Script):
 
         """
 
-    async def on_application_shutdown(self, application):
+    async def on_application_shutdown(self, application: Application):
         """Handler run at Application shutdown.
 
         This must be a coroutine.
@@ -66,18 +79,19 @@ class PrometheusExporterScript(Script):
 
         """
 
-    def configure(self, args):
+    def configure(self, args: argparse.Namespace):
         """Perform additional confguration steps at script startup.
 
         Subclasses can implement this.
 
         """
 
-    def create_metrics(self, metric_configs):
+    def create_metrics(
+            self, metric_configs: Iterable[MetricConfig]) -> Dict[str, Metric]:
         """Create and register metrics from a list of MetricConfigs."""
         return self.registry.create_metrics(metric_configs)
 
-    def get_parser(self):
+    def get_parser(self) -> argparse.ArgumentParser:
         parser = argparse.ArgumentParser(
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
             description=self.description)
@@ -102,14 +116,14 @@ class PrometheusExporterScript(Script):
         self.configure_argument_parser(parser)
         return parser
 
-    def main(self, args):
+    def main(self, args: argparse.Namespace):
         self._setup_logging(args.log_level)
         self._configure_registry(include_process_stats=args.process_stats)
         self.configure(args)
         exporter = self._get_exporter(args)
         exporter.run()
 
-    def _setup_logging(self, log_level):
+    def _setup_logging(self, log_level: str):
         """Setup logging for the application and aiohttp."""
         level = getattr(logging, log_level)
         names = (
@@ -118,13 +132,13 @@ class PrometheusExporterScript(Script):
         for name in names:
             setup_logger(name=name, stream=sys.stderr, level=level)
 
-    def _configure_registry(self, include_process_stats=False):
+    def _configure_registry(self, include_process_stats: bool = False):
         """Configure the MetricRegistry."""
         if include_process_stats:
             self.registry.register_additional_collector(
                 ProcessCollector(registry=None))
 
-    def _get_exporter(self, args):
+    def _get_exporter(self, args: argparse.Namespace) -> PrometheusExporter:
         """Return a :class:`PrometheusExporter` configured with args."""
         exporter = PrometheusExporter(
             self.name, self.description, args.host, args.port, self.registry)

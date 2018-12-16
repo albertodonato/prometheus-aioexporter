@@ -1,6 +1,11 @@
 """Helpers around prometheus-client to create and register metrics."""
 
 from collections import namedtuple
+from typing import (
+    Dict,
+    Iterable,
+    Union,
+)
 
 from prometheus_client import (
     CollectorRegistry,
@@ -8,6 +13,7 @@ from prometheus_client import (
     Gauge,
     generate_latest,
     Histogram,
+    Metric,
     Summary,
 )
 
@@ -65,20 +71,25 @@ class InvalidMetricType(Exception):
 class MetricsRegistry:
     """A registry for metrics."""
 
+    registry: CollectorRegistry
+
     def __init__(self):
         self.registry = CollectorRegistry(auto_describe=True)
-        self._metrics = {}
+        self._metrics: Dict[str, Metric] = {}
 
-    def create_metrics(self, configs):
+    def create_metrics(self,
+                       configs: Iterable[MetricConfig]) -> Dict[str, Metric]:
         """Create Prometheus metrics from a list of MetricConfigs."""
-        metrics = {
+        metrics: Dict[str, Metric] = {
             config.name: self._register_metric(config)
             for config in configs
         }
         self._metrics.update(metrics)
         return metrics
 
-    def get_metric(self, name, labels=None):
+    def get_metric(
+            self, name: str,
+            labels: Union[Dict[str, str], None] = None) -> Metric:
         """Return a metric, optionally configured with labels."""
         metric = self._metrics[name]
         if labels:
@@ -86,7 +97,7 @@ class MetricsRegistry:
 
         return metric
 
-    def get_metrics(self):
+    def get_metrics(self) -> Dict[str, Metric]:
         """Return a dict mapping names to metrics."""
         return self._metrics.copy()
 
@@ -99,11 +110,11 @@ class MetricsRegistry:
         """
         self.registry.register(collector)
 
-    def generate_metrics(self):
+    def generate_metrics(self) -> bytes:
         """Generate text with metrics values from the registry."""
-        return generate_latest(self.registry)
+        return bytes(generate_latest(self.registry))
 
-    def _register_metric(self, config):
+    def _register_metric(self, config: MetricConfig) -> Metric:
         metric_info = METRIC_TYPES[config.type]
         options = {
             metric_info['options'][key]: value
