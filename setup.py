@@ -27,7 +27,7 @@ config = {
     'include_package_data': True,
     'test_suite': 'prometheus_aioexporter',
     'install_requires': [
-        'aiohttp >= 3.0.0', 'prometheus-client', 'toolrack >= 2.1.0'
+        'aiohttp >= 3.0.0', 'prometheus-client >= 0.4.0', 'toolrack >= 2.1.0'
     ],
     'tests_require': tests_require,
     'extras_require': {

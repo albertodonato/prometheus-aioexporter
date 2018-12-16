@@ -19,7 +19,7 @@ from prometheus_client import (
     Metric,
 )
 
-from ..metric import MetricsRegistry
+from .metric import MetricsRegistry
 
 # Signature for update handler
 UpdateHandler = Callable[[Iterable[Metric]], Awaitable[None]]

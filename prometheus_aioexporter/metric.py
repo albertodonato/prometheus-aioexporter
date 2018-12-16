@@ -4,46 +4,46 @@ from collections import namedtuple
 from typing import (
     Dict,
     Iterable,
+    NamedTuple,
     Union,
 )
 
 from prometheus_client import (
     CollectorRegistry,
     Counter,
+    Enum,
     Gauge,
     generate_latest,
     Histogram,
+    Info,
     Metric,
     Summary,
 )
 
-# Map metric types to classes and allowed options
-METRIC_TYPES = {
-    'counter': {
-        'class': Counter,
-        'options': {
-            'labels': 'labelnames'
-        }
-    },
-    'gauge': {
-        'class': Gauge,
-        'options': {
-            'labels': 'labelnames'
-        }
-    },
-    'histogram': {
-        'class': Histogram,
-        'options': {
+
+class MetricType(NamedTuple):
+    """Details about a metric type."""
+
+    cls: Metric
+    options: Dict[str, str] = {}
+
+
+# Map metric types to their MetricTypes
+METRIC_TYPES: Dict[str, MetricType] = {
+    'counter': MetricType(cls=Counter, options={'labels': 'labelnames'}),
+    'enum': MetricType(
+        cls=Enum, options={
+            'labels': 'labelnames',
+            'states': 'states'
+        }),
+    'gauge': MetricType(cls=Gauge, options={'labels': 'labelnames'}),
+    'histogram': MetricType(
+        cls=Histogram, options={
             'labels': 'labelnames',
             'buckets': 'buckets'
-        }
-    },
-    'summary': {
-        'class': Summary,
-        'options': {
-            'labels': 'labelnames'
-        }
-    }
+        }),
+    'info': MetricType(cls=Info, options={'labels': 'labelnames'}),
+    'summary': MetricType(cls=Summary, options={'labels': 'labelnames'})
 }
 
 
@@ -115,11 +115,11 @@ class MetricsRegistry:
         return bytes(generate_latest(self.registry))
 
     def _register_metric(self, config: MetricConfig) -> Metric:
-        metric_info = METRIC_TYPES[config.type]
+        metric_type = METRIC_TYPES[config.type]
         options = {
-            metric_info['options'][key]: value
+            metric_type.options[key]: value
             for key, value in config.config.items()
-            if key in metric_info['options']
+            if key in metric_type.options
         }
-        return metric_info['class'](
+        return metric_type.cls(
             config.name, config.description, registry=self.registry, **options)

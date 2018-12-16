@@ -14,8 +14,8 @@ class TestMetricConfig:
         with pytest.raises(InvalidMetricType) as error:
             MetricConfig('m1', 'desc1', 'unknown', {})
         assert str(error.value) == (
-            'Invalid type for m1: must be one of counter, gauge,'
-            ' histogram, summary')
+            'Invalid type for m1: must be one of counter, enum, '
+            'gauge, histogram, info, summary')
 
 
 class TestMetricsRegistry:
@@ -79,12 +79,29 @@ class TestMetricsRegistry:
         metric = registry.get_metric('m', {'l1': 'v1', 'l2': 'v2'})
         assert metric._labelvalues == ('v1', 'v2')
 
-    def test_generate_metrics(self):
+    @pytest.mark.parametrize(
+        'typ,params,action,text', [
+            ('counter', {}, lambda metric: metric.inc(),
+             'counter\ntest_counter_total 1.0'),
+            ('enum', {'states': ['on', 'off']},
+             lambda metric: metric.state('on'),
+             'test_enum{test_enum="on"}'),
+            ('gauge', {}, lambda metric: metric.set(12.3),
+             'test_gauge 12.3'),
+            ('histogram', {'buckets': [10, 20]},
+             lambda metric: metric.observe(1.23),
+             'test_histogram_bucket{le="10.0"} 1.0'),
+            ('info', {},
+             lambda metric: metric.info({'foo': 'bar', 'baz': 'bza'}),
+             'test_info_info{baz="bza",foo="bar"}'),
+            ('summary', {}, lambda metric: metric.observe(1.23),
+             'test_summary_sum 1.23')
+        ])
+    def test_generate_metrics(self, typ, params, action, text):
         """generate_metrics returns text with metrics values."""
         registry = MetricsRegistry()
+        name = 'test_' + typ
         metrics = registry.create_metrics(
-            [MetricConfig('test_gauge', 'A test gauge', 'gauge', {})])
-        metrics['test_gauge'].set(12.3)
-        text = registry.generate_metrics().decode('utf-8')
-        assert 'HELP test_gauge A test gauge' in text
-        assert 'test_gauge 12.3' in text
+            [MetricConfig(name, 'A test metric', typ, params)])
+        action(metrics[name])
+        assert text in registry.generate_metrics().decode('utf-8')
