@@ -5,25 +5,20 @@ from setuptools import (
     setup,
 )
 
-from prometheus_aioexporter import (
-    __doc__ as description,
-    __version__,
-)
-
 tests_require = ['pytest', 'pytest-aiohttp', 'pytest-mock']
 
 config = {
     'name': 'prometheus-aioexporter',
-    'version': __version__,
+    'version': '1.4.0',
     'license': 'LGPLv3+',
-    'description': description,
+    'description': 'Asyncio library for creating Prometheus exporters.',
     'long_description': Path('README.rst').read_text(),
     'author': 'Alberto Donato',
     'author_email': 'alberto.donato@gmail.com',
     'maintainer': 'Alberto Donato',
     'maintainer_email': 'alberto.donato@gmail.com',
     'url': 'https://github.com/albertodonato/prometheus-aioexporter',
-    'packages': find_packages(),
+    'packages': find_packages(include='prometheus_aioexporter.*'),
     'include_package_data': True,
     'test_suite': 'prometheus_aioexporter',
     'install_requires': [

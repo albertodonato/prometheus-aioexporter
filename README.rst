@@ -24,7 +24,7 @@ An example usage is the following:
 
 .. code:: python
 
-    from prometheus_aioexporter.script import PrometheusExporterScript
+    from prometheus_aioexporter import PrometheusExporterScript
 
 
     class MyExporter(PrometheusExporterScript):
