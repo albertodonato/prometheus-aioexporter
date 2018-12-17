@@ -1,4 +1,14 @@
-1.3.0 - 2018-02-20
+1.5.0 - 2018-12-18
+==================
+
+- Support for ``enum`` and ``info`` metric types.
+- Support Python 3.7
+- Drop support for Python 3.5
+- Add typing
+- Switch tests to pytest
+
+
+1.4.0 - 2018-02-20
 ==================
 
 - Updates to support aiohttp 3.0.x.
