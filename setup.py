@@ -18,7 +18,8 @@ config = {
     'maintainer': 'Alberto Donato',
     'maintainer_email': 'alberto.donato@gmail.com',
     'url': 'https://github.com/albertodonato/prometheus-aioexporter',
-    'packages': find_packages(include='prometheus_aioexporter.*'),
+    'packages': find_packages(
+        include=['prometheus_aioexporter', 'prometheus_aioexporter.*']),
     'include_package_data': True,
     'test_suite': 'prometheus_aioexporter',
     'install_requires': [
