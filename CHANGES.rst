@@ -1,3 +1,10 @@
+1.5.1 - 2018-12-28
+==================
+
+- Export ``MetricsRegistry`` and ``MetricConfig`` from package base.
+- A few cleanups for Python 3.6
+
+
 1.5.0 - 2018-12-18
 ==================
 
