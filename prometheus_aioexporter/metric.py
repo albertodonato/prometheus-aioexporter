@@ -63,9 +63,9 @@ class InvalidMetricType(Exception):
     def __init__(self, name, invalid_type):
         self.name = name
         self.invalid_type = invalid_type
+        type_list = ', '.join(sorted(METRIC_TYPES))
         super().__init__(
-            'Invalid type for {}: must be one of {}'.format(
-                self.name, ', '.join(sorted(METRIC_TYPES))))
+            f'Invalid type for {self.name}: must be one of {type_list}')
 
 
 class MetricsRegistry:

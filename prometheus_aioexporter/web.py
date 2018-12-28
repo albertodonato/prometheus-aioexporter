@@ -79,31 +79,30 @@ class PrometheusExporter:
 
     async def _log_startup_message(self, app: Application):
         """Log message about application startup."""
-        self.app.logger.info(
-            'Listening on http://{}:{}'.format(self.host, self.port))
+        self.app.logger.info(f'Listening on http://{self.host}:{self.port}')
 
     async def _handle_home(self, request: Request) -> Response:
         """Home page request handler."""
         if self.description:
-            title = '{app.name} - {app.description}'.format(app=self)
+            title = f'{self.name} - {self.description}'
         else:
             title = self.name
 
         text = dedent(
-            '''<!DOCTYPE html>
-          <html>
-            <head>
-              <title>{title}</title>
-            </head>
-            <body>
-              <h1>{title}</h1>
-              <p>
-                Metric are exported at the
-                <a href="/metrics">/metrics</a> endpoint.
-              </p>
-            </body>
-          </html>
-        ''').format(title=title)
+            f'''<!DOCTYPE html>
+            <html>
+              <head>
+                <title>{title}</title>
+              </head>
+              <body>
+                <h1>{title}</h1>
+                <p>
+                  Metric are exported at the
+                  <a href="/metrics">/metrics</a> endpoint.
+                </p>
+              </body>
+            </html>
+            ''')
         return Response(content_type='text/html', text=text)
 
     async def _handle_metrics(self, request: Request) -> Response:
