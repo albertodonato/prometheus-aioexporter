@@ -81,21 +81,29 @@ class TestMetricsRegistry:
 
     @pytest.mark.parametrize(
         'typ,params,action,text', [
-            ('counter', {}, lambda metric: metric.inc(),
-             'counter\ntest_counter_total 1.0'),
-            ('enum', {'states': ['on', 'off']},
-             lambda metric: metric.state('on'),
-             'test_enum{test_enum="on"}'),
-            ('gauge', {}, lambda metric: metric.set(12.3),
-             'test_gauge 12.3'),
-            ('histogram', {'buckets': [10, 20]},
-             lambda metric: metric.observe(1.23),
-             'test_histogram_bucket{le="10.0"} 1.0'),
-            ('info', {},
-             lambda metric: metric.info({'foo': 'bar', 'baz': 'bza'}),
-             'test_info_info{baz="bza",foo="bar"}'),
-            ('summary', {}, lambda metric: metric.observe(1.23),
-             'test_summary_sum 1.23')
+            (
+                'counter', {}, lambda metric: metric.inc(),
+                'counter\ntest_counter_total 1.0'),
+            (
+                'enum', {
+                    'states': ['on', 'off']
+                }, lambda metric: metric.state('on'),
+                'test_enum{test_enum="on"}'),
+            ('gauge', {}, lambda metric: metric.set(12.3), 'test_gauge 12.3'),
+            (
+                'histogram', {
+                    'buckets': [10, 20]
+                }, lambda metric: metric.observe(1.23),
+                'test_histogram_bucket{le="10.0"} 1.0'),
+            (
+                'info', {},
+                lambda metric: metric.info({
+                    'foo': 'bar',
+                    'baz': 'bza'
+                }), 'test_info_info{baz="bza",foo="bar"}'),
+            (
+                'summary', {}, lambda metric: metric.observe(1.23),
+                'test_summary_sum 1.23')
         ])
     def test_generate_metrics(self, typ, params, action, text):
         """generate_metrics returns text with metrics values."""
