@@ -1,3 +1,9 @@
+1.6.0 - 2019-03-26
+==================
+
+- Make default exporter port configurable via ``PrometheusExporterScript.default_port``.
+
+
 1.5.1 - 2018-12-28
 ==================
 
