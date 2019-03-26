@@ -129,7 +129,7 @@ coroutine and is called with a dict mapping metric names to metric objects:
 
     async def on_application_startup(self, application):
         # ...
-        application.set_metric_update_handler(self._update_handler)
+        application['exporter'].set_metric_update_handler(self._update_handler)
 
     async def _update_handler(self, metrics):
         for name, metric in metrics.items():
