@@ -30,6 +30,10 @@ class PrometheusExporterScript(Script):
 
     # Name of the script, can be set by subsclasses.
     name: ClassVar[str] = 'prometheus-exporter'
+
+    # The defualt port for the exporter, can be changed by subclasses.
+    default_port: int = 9090
+
     registry: MetricsRegistry
 
     def __init__(self, stdout=None, stderr=None, loop=None):
@@ -101,7 +105,7 @@ class PrometheusExporterScript(Script):
             '-p',
             '--port',
             type=int,
-            default=9090,
+            default=self.default_port,
             help='port to run the webserver on')
         parser.add_argument(
             '-L',

@@ -10,6 +10,7 @@ class SampleScript(PrometheusExporterScript):
     """A sample script"""
 
     name = 'sample-script'
+    default_port = 12345
 
 
 class TestPrometheusExporterScript:
@@ -93,6 +94,6 @@ class TestPrometheusExporterScript:
         mock_run_app.assert_called_with(
             mock.ANY,
             host='localhost',
-            port=9090,
+            port=12345,
             print=mock.ANY,
             access_log_format='%a "%r" %s %b "%{Referrer}i" "%{User-Agent}i"')
