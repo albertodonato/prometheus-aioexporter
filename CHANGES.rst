@@ -1,3 +1,9 @@
+1.6.1 - 2019-09-17
+==================
+
+- Support passing multiple hostnames/addresses to bind via ``-H/--host``.
+
+
 1.6.0 - 2019-03-26
 ==================
 

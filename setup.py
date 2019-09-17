@@ -9,7 +9,7 @@ tests_require = ['pytest', 'pytest-aiohttp', 'pytest-mock']
 
 config = {
     'name': 'prometheus-aioexporter',
-    'version': '1.6.0',
+    'version': '1.6.1',
     'license': 'LGPLv3+',
     'description': 'Asyncio library for creating Prometheus exporters.',
     'long_description': Path('README.rst').read_text(),
