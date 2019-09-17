@@ -5,6 +5,7 @@ from typing import (
     Awaitable,
     Callable,
     Iterable,
+    List,
     Optional,
 )
 
@@ -30,7 +31,7 @@ class PrometheusExporter:
 
     name: str
     descrption: str
-    host: str
+    hosts: List[str]
     port: int
     register: MetricsRegistry
     app: Application
@@ -38,11 +39,11 @@ class PrometheusExporter:
     _update_handler: Optional[UpdateHandler] = None
 
     def __init__(
-            self, name: str, description: str, host: str, port: int,
+            self, name: str, description: str, hosts: List[str], port: int,
             registry: MetricsRegistry):
         self.name = name
         self.description = description
-        self.host = host
+        self.hosts = hosts
         self.port = port
         self.registry = registry
         self.app = self._make_application()
@@ -63,7 +64,7 @@ class PrometheusExporter:
         """Run the :class:`aiohttp.web.Application` for the exporter."""
         run_app(
             self.app,
-            host=self.host,
+            host=self.hosts,
             port=self.port,
             print=lambda *args, **kargs: None,
             access_log_format='%a "%r" %s %b "%{Referrer}i" "%{User-Agent}i"')
@@ -79,7 +80,10 @@ class PrometheusExporter:
 
     async def _log_startup_message(self, app: Application):
         """Log message about application startup."""
-        self.app.logger.info(f'Listening on http://{self.host}:{self.port}')
+        for host in self.hosts:
+            if ':' in host:
+                host = f'[{host}]'
+            self.app.logger.info(f'Listening on http://{host}:{self.port}')
 
     async def _handle_home(self, request: Request) -> Response:
         """Home page request handler."""

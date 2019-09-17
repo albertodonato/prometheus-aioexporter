@@ -86,3 +86,14 @@ class TestPrometheusExporter:
         client = await test_client(exporter.app)
         await client.request('GET', '/metrics')
         assert args == [metrics]
+
+    async def test_startup_logger(self, mocker, registry):
+        exporter = PrometheusExporter(
+            'test-app', 'A test application', ['0.0.0.0', '::1'], 8000,
+            registry)
+        mock_log = mocker.patch.object(exporter.app.logger, 'info')
+        await exporter._log_startup_message(exporter.app)
+        assert mock_log.mock_calls == [
+            mock.call('Listening on http://0.0.0.0:8000'),
+            mock.call('Listening on http://[::1]:8000')
+        ]

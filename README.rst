@@ -63,7 +63,8 @@ Exporter command-line
 
     optional arguments:
       -h, --help            show this help message and exit
-      -H HOST, --host HOST  host address to bind (default: localhost)
+      -H HOST [HOST ...], --host HOST [HOST ...]
+                            host addresses to bind (default: localhost)
       -p PORT, --port PORT  port to run the webserver on (default: 9090)
       -L {CRITICAL,ERROR,WARNING,INFO,DEBUG}, --log-level {CRITICAL,ERROR,WARNING,INFO,DEBUG}
                             minimum level for log messages (default: WARNING)

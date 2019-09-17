@@ -100,7 +100,11 @@ class PrometheusExporterScript(Script):
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
             description=self.description)
         parser.add_argument(
-            '-H', '--host', default='localhost', help='host address to bind')
+            '-H',
+            '--host',
+            default='localhost',
+            nargs='+',
+            help='host addresses to bind')
         parser.add_argument(
             '-p',
             '--port',
