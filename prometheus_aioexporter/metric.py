@@ -5,7 +5,7 @@ from typing import (
     Dict,
     Iterable,
     NamedTuple,
-    Union,
+    Optional,
 )
 
 from prometheus_client import (
@@ -89,7 +89,7 @@ class MetricsRegistry:
 
     def get_metric(
             self, name: str,
-            labels: Union[Dict[str, str], None] = None) -> Metric:
+            labels: Optional[Dict[str, str]] = None) -> Metric:
         """Return a metric, optionally configured with labels."""
         metric = self._metrics[name]
         if labels:

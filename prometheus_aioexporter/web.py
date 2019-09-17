@@ -5,7 +5,7 @@ from typing import (
     Awaitable,
     Callable,
     Iterable,
-    Union,
+    Optional,
 )
 
 from aiohttp.web import (
@@ -35,7 +35,7 @@ class PrometheusExporter:
     register: MetricsRegistry
     app: Application
 
-    _update_handler: Union[UpdateHandler, None] = None
+    _update_handler: Optional[UpdateHandler] = None
 
     def __init__(
             self, name: str, description: str, host: str, port: int,
