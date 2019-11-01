@@ -1,7 +1,6 @@
 *.pyc
 *.pyo
 /build
-/html
 /*.egg-info
 /.coverage
 /.mypy_cache

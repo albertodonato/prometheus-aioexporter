@@ -39,8 +39,13 @@ class PrometheusExporter:
     _update_handler: Optional[UpdateHandler] = None
 
     def __init__(
-            self, name: str, description: str, hosts: List[str], port: int,
-            registry: MetricsRegistry):
+        self,
+        name: str,
+        description: str,
+        hosts: List[str],
+        port: int,
+        registry: MetricsRegistry,
+    ):
         self.name = name
         self.description = description
         self.hosts = hosts
@@ -67,33 +72,34 @@ class PrometheusExporter:
             host=self.hosts,
             port=self.port,
             print=lambda *args, **kargs: None,
-            access_log_format='%a "%r" %s %b "%{Referrer}i" "%{User-Agent}i"')
+            access_log_format='%a "%r" %s %b "%{Referrer}i" "%{User-Agent}i"',
+        )
 
     def _make_application(self) -> Application:
         """Setup an :class:`aiohttp.web.Application`."""
         app = Application()
-        app['exporter'] = self
-        app.router.add_get('/', self._handle_home)
-        app.router.add_get('/metrics', self._handle_metrics)
+        app["exporter"] = self
+        app.router.add_get("/", self._handle_home)
+        app.router.add_get("/metrics", self._handle_metrics)
         app.on_startup.append(self._log_startup_message)
         return app
 
     async def _log_startup_message(self, app: Application):
         """Log message about application startup."""
         for host in self.hosts:
-            if ':' in host:
-                host = f'[{host}]'
-            self.app.logger.info(f'Listening on http://{host}:{self.port}')
+            if ":" in host:
+                host = f"[{host}]"
+            self.app.logger.info(f"Listening on http://{host}:{self.port}")
 
     async def _handle_home(self, request: Request) -> Response:
         """Home page request handler."""
         if self.description:
-            title = f'{self.name} - {self.description}'
+            title = f"{self.name} - {self.description}"
         else:
             title = self.name
 
         text = dedent(
-            f'''<!DOCTYPE html>
+            f"""<!DOCTYPE html>
             <html>
               <head>
                 <title>{title}</title>
@@ -106,8 +112,9 @@ class PrometheusExporter:
                 </p>
               </body>
             </html>
-            ''')
-        return Response(content_type='text/html', text=text)
+            """
+        )
+        return Response(content_type="text/html", text=text)
 
     async def _handle_metrics(self, request: Request) -> Response:
         """Handler for metrics."""

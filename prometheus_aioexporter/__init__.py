@@ -11,9 +11,12 @@ from .metric import (
 from .script import PrometheusExporterScript
 
 __all__ = [
-    '__version__', 'MetricConfig', 'MetricsRegistry',
-    'PrometheusExporterScript'
+    "__version__",
+    "MetricConfig",
+    "MetricsRegistry",
+    "PrometheusExporterScript",
 ]
 
 __version__ = LooseVersion(
-    pkg_resources.require('prometheus_aioexporter')[0].version)
+    pkg_resources.require("prometheus_aioexporter")[0].version
+)

@@ -30,25 +30,22 @@ class MetricType(NamedTuple):
 
 # Map metric types to their MetricTypes
 METRIC_TYPES: Dict[str, MetricType] = {
-    'counter': MetricType(cls=Counter, options={'labels': 'labelnames'}),
-    'enum': MetricType(
-        cls=Enum, options={
-            'labels': 'labelnames',
-            'states': 'states'
-        }),
-    'gauge': MetricType(cls=Gauge, options={'labels': 'labelnames'}),
-    'histogram': MetricType(
-        cls=Histogram, options={
-            'labels': 'labelnames',
-            'buckets': 'buckets'
-        }),
-    'info': MetricType(cls=Info, options={'labels': 'labelnames'}),
-    'summary': MetricType(cls=Summary, options={'labels': 'labelnames'})
+    "counter": MetricType(cls=Counter, options={"labels": "labelnames"}),
+    "enum": MetricType(
+        cls=Enum, options={"labels": "labelnames", "states": "states"}
+    ),
+    "gauge": MetricType(cls=Gauge, options={"labels": "labelnames"}),
+    "histogram": MetricType(
+        cls=Histogram, options={"labels": "labelnames", "buckets": "buckets"}
+    ),
+    "info": MetricType(cls=Info, options={"labels": "labelnames"}),
+    "summary": MetricType(cls=Summary, options={"labels": "labelnames"}),
 }
 
 
-class MetricConfig(namedtuple('MetricConfig',
-                              ['name', 'description', 'type', 'config'])):
+class MetricConfig(
+    namedtuple("MetricConfig", ["name", "description", "type", "config"])
+):
     """Configuration for a metric."""
 
     def __new__(cls, name, description, typ, config):
@@ -63,9 +60,10 @@ class InvalidMetricType(Exception):
     def __init__(self, name, invalid_type):
         self.name = name
         self.invalid_type = invalid_type
-        type_list = ', '.join(sorted(METRIC_TYPES))
+        type_list = ", ".join(sorted(METRIC_TYPES))
         super().__init__(
-            f'Invalid type for {self.name}: must be one of {type_list}')
+            f"Invalid type for {self.name}: must be one of {type_list}"
+        )
 
 
 class MetricsRegistry:
@@ -77,19 +75,19 @@ class MetricsRegistry:
         self.registry = CollectorRegistry(auto_describe=True)
         self._metrics: Dict[str, Metric] = {}
 
-    def create_metrics(self,
-                       configs: Iterable[MetricConfig]) -> Dict[str, Metric]:
+    def create_metrics(
+        self, configs: Iterable[MetricConfig]
+    ) -> Dict[str, Metric]:
         """Create Prometheus metrics from a list of MetricConfigs."""
         metrics: Dict[str, Metric] = {
-            config.name: self._register_metric(config)
-            for config in configs
+            config.name: self._register_metric(config) for config in configs
         }
         self._metrics.update(metrics)
         return metrics
 
     def get_metric(
-            self, name: str,
-            labels: Optional[Dict[str, str]] = None) -> Metric:
+        self, name: str, labels: Optional[Dict[str, str]] = None
+    ) -> Metric:
         """Return a metric, optionally configured with labels."""
         metric = self._metrics[name]
         if labels:
@@ -122,4 +120,5 @@ class MetricsRegistry:
             if key in metric_type.options
         }
         return metric_type.cls(
-            config.name, config.description, registry=self.registry, **options)
+            config.name, config.description, registry=self.registry, **options
+        )

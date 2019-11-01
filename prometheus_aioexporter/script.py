@@ -29,7 +29,7 @@ class PrometheusExporterScript(Script):
     """Expose metrics to Prometheus."""
 
     # Name of the script, can be set by subsclasses.
-    name: ClassVar[str] = 'prometheus-exporter'
+    name: ClassVar[str] = "prometheus-exporter"
 
     # The defualt port for the exporter, can be changed by subclasses.
     default_port: int = 9090
@@ -48,7 +48,7 @@ class PrometheusExporterScript(Script):
         By default, return the class docstring.
 
         """
-        return self.__doc__ or ''
+        return self.__doc__ or ""
 
     @property
     def logger(self) -> logging.Logger:
@@ -91,36 +91,42 @@ class PrometheusExporterScript(Script):
         """
 
     def create_metrics(
-            self, metric_configs: Iterable[MetricConfig]) -> Dict[str, Metric]:
+        self, metric_configs: Iterable[MetricConfig]
+    ) -> Dict[str, Metric]:
         """Create and register metrics from a list of MetricConfigs."""
         return self.registry.create_metrics(metric_configs)
 
     def get_parser(self) -> argparse.ArgumentParser:
         parser = argparse.ArgumentParser(
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-            description=self.description)
+            description=self.description,
+        )
         parser.add_argument(
-            '-H',
-            '--host',
-            default=['localhost'],
-            nargs='+',
-            help='host addresses to bind')
+            "-H",
+            "--host",
+            default=["localhost"],
+            nargs="+",
+            help="host addresses to bind",
+        )
         parser.add_argument(
-            '-p',
-            '--port',
+            "-p",
+            "--port",
             type=int,
             default=self.default_port,
-            help='port to run the webserver on')
+            help="port to run the webserver on",
+        )
         parser.add_argument(
-            '-L',
-            '--log-level',
-            default='WARNING',
-            choices=['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'],
-            help='minimum level for log messages')
+            "-L",
+            "--log-level",
+            default="WARNING",
+            choices=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"],
+            help="minimum level for log messages",
+        )
         parser.add_argument(
-            '--process-stats',
-            action='store_true',
-            help='include process stats in metrics')
+            "--process-stats",
+            action="store_true",
+            help="include process stats in metrics",
+        )
         self.configure_argument_parser(parser)
         return parser
 
@@ -135,8 +141,12 @@ class PrometheusExporterScript(Script):
         """Setup logging for the application and aiohttp."""
         level = getattr(logging, log_level)
         names = (
-            'aiohttp.access', 'aiohttp.internal', 'aiohttp.server',
-            'aiohttp.web', self.name)
+            "aiohttp.access",
+            "aiohttp.internal",
+            "aiohttp.server",
+            "aiohttp.web",
+            self.name,
+        )
         for name in names:
             setup_logger(name=name, stream=sys.stderr, level=level)
 
@@ -144,12 +154,14 @@ class PrometheusExporterScript(Script):
         """Configure the MetricRegistry."""
         if include_process_stats:
             self.registry.register_additional_collector(
-                ProcessCollector(registry=None))
+                ProcessCollector(registry=None)
+            )
 
     def _get_exporter(self, args: argparse.Namespace) -> PrometheusExporter:
         """Return a :class:`PrometheusExporter` configured with args."""
         exporter = PrometheusExporter(
-            self.name, self.description, args.host, args.port, self.registry)
+            self.name, self.description, args.host, args.port, self.registry
+        )
         exporter.app.on_startup.append(self.on_application_startup)
         exporter.app.on_shutdown.append(self.on_application_shutdown)
         return exporter
