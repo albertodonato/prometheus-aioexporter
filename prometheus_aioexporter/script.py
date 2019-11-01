@@ -102,7 +102,7 @@ class PrometheusExporterScript(Script):
         parser.add_argument(
             '-H',
             '--host',
-            default='localhost',
+            default=['localhost'],
             nargs='+',
             help='host addresses to bind')
         parser.add_argument(
