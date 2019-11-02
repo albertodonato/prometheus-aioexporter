@@ -1,3 +1,10 @@
+1.6.2 - 2019-10-02
+==================
+
+- Fix default parameter for ``-H/--host``.
+- Convert project formatting to Black.
+
+
 1.6.1 - 2019-09-17
 ==================
 
