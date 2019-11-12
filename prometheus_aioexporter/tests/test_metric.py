@@ -32,9 +32,7 @@ class TestMetricsRegistry:
 
     def test_create_metrics_with_config(self):
         """Metric configs are applied."""
-        configs = [
-            MetricConfig("m1", "desc1", "histogram", {"buckets": [10, 20]})
-        ]
+        configs = [MetricConfig("m1", "desc1", "histogram", {"buckets": [10, 20]})]
         metrics = MetricsRegistry().create_metrics(configs)
         # The two specified bucket plus +Inf
         assert len(metrics["m1"]._buckets) == 3
@@ -58,11 +56,7 @@ class TestMetricsRegistry:
 
     def test_get_metric(self):
         """get_metric returns a metric."""
-        configs = [
-            MetricConfig(
-                "m", "A test gauge", "gauge", {"labels": ["l1", "l2"]}
-            )
-        ]
+        configs = [MetricConfig("m", "A test gauge", "gauge", {"labels": ["l1", "l2"]})]
         registry = MetricsRegistry()
         registry.create_metrics(configs)
         metric = registry.get_metric("m")
@@ -71,11 +65,7 @@ class TestMetricsRegistry:
 
     def test_get_metric_with_labels(self):
         """get_metric returns a metric configured with labels."""
-        configs = [
-            MetricConfig(
-                "m", "A test gauge", "gauge", {"labels": ["l1", "l2"]}
-            )
-        ]
+        configs = [MetricConfig("m", "A test gauge", "gauge", {"labels": ["l1", "l2"]})]
         registry = MetricsRegistry()
         registry.create_metrics(configs)
         metric = registry.get_metric("m", {"l1": "v1", "l2": "v2"})

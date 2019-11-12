@@ -17,6 +17,4 @@ __all__ = [
     "PrometheusExporterScript",
 ]
 
-__version__ = LooseVersion(
-    pkg_resources.require("prometheus_aioexporter")[0].version
-)
+__version__ = LooseVersion(pkg_resources.require("prometheus_aioexporter")[0].version)

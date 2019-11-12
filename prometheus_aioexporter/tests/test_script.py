@@ -55,9 +55,7 @@ class TestPrometheusExporterScript:
 
     def test_setup_logging(self, mocker):
         """Logging is set up."""
-        mock_setup_logger = mocker.patch(
-            "prometheus_aioexporter.script.setup_logger"
-        )
+        mock_setup_logger = mocker.patch("prometheus_aioexporter.script.setup_logger")
         mocker.patch("prometheus_aioexporter.web.PrometheusExporter.run")
         SampleScript()([])
         logger_names = (
@@ -80,8 +78,7 @@ class TestPrometheusExporterScript:
         script(["--process-stats"])
         # process stats are present in the registry
         assert (
-            "process_cpu_seconds_total"
-            in script.registry.registry._names_to_collectors
+            "process_cpu_seconds_total" in script.registry.registry._names_to_collectors
         )
 
     def test_get_exporter_registers_handlers(self):

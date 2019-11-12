@@ -153,9 +153,7 @@ class PrometheusExporterScript(Script):
     def _configure_registry(self, include_process_stats: bool = False):
         """Configure the MetricRegistry."""
         if include_process_stats:
-            self.registry.register_additional_collector(
-                ProcessCollector(registry=None)
-            )
+            self.registry.register_additional_collector(ProcessCollector(registry=None))
 
     def _get_exporter(self, args: argparse.Namespace) -> PrometheusExporter:
         """Return a :class:`PrometheusExporter` configured with args."""
