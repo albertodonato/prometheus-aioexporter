@@ -142,6 +142,6 @@ coroutine and is called with a dict mapping metric names to metric objects:
 .. |Latest Version| image:: https://img.shields.io/pypi/v/prometheus-aioexporter.svg
    :target: https://pypi.python.org/pypi/prometheus-aioexporter
 .. |Build Status| image:: https://img.shields.io/travis/albertodonato/prometheus-aioexporter.svg
-   :target: https://travis-ci.org/albertodonato/prometheus-aioexporter
+   :target: https://travis-ci.com/albertodonato/prometheus-aioexporter
 .. |Coverage Status| image:: https://img.shields.io/codecov/c/github/albertodonato/prometheus-aioexporter/master.svg
    :target: https://codecov.io/gh/albertodonato/prometheus-aioexporter
