@@ -140,8 +140,11 @@ coroutine and is called with a dict mapping metric names to metric objects:
 .. _Prometheus: https://prometheus.io/
 
 .. |Latest Version| image:: https://img.shields.io/pypi/v/prometheus-aioexporter.svg
+   :alt: Latest Version
    :target: https://pypi.python.org/pypi/prometheus-aioexporter
-.. |Build Status| image:: https://img.shields.io/travis/albertodonato/prometheus-aioexporter.svg
-   :target: https://travis-ci.com/albertodonato/prometheus-aioexporter
+.. |Build Status| image:: https://github.com/albertodonato/prometheus-aioexporter/workflows/CI/badge.svg
+   :alt: Build Status
+   :target: https://github.com/albertodonato/prometheus-aioexporter/actions?query=workflow%3ACI
 .. |Coverage Status| image:: https://img.shields.io/codecov/c/github/albertodonato/prometheus-aioexporter/master.svg
+   :alt: Coverage Status
    :target: https://codecov.io/gh/albertodonato/prometheus-aioexporter
