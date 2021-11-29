@@ -1,7 +1,6 @@
 """Run a web server providing a Prometheus metrics endpoint."""
 
 import argparse
-import asyncio
 import logging
 import sys
 from typing import (
@@ -38,7 +37,6 @@ class PrometheusExporterScript(Script):
 
     def __init__(self, stdout=None, stderr=None, loop=None):
         super().__init__(stdout=stdout, stderr=stderr)
-        self.loop = loop or asyncio.get_event_loop()
         self.registry = MetricsRegistry()
 
     @property
