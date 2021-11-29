@@ -58,7 +58,7 @@ class MetricConfig(
 class InvalidMetricType(Exception):
     """Raised when invalid metric type is found."""
 
-    def __init__(self, name, invalid_type):
+    def __init__(self, name: str, invalid_type: str):
         self.name = name
         self.invalid_type = invalid_type
         type_list = ", ".join(sorted(METRIC_TYPES))
