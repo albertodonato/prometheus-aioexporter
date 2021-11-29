@@ -1,5 +1,5 @@
-prometheus-aioexporter - Asyncio library for creating Prometheus exporters
-==========================================================================
+Asyncio library for creating Prometheus exporters
+=================================================
 
 |Latest Version| |Build Status| |Coverage Status|
 

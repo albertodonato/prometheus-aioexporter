@@ -6,7 +6,9 @@ import sys
 from typing import (
     ClassVar,
     Dict,
+    IO,
     Iterable,
+    Optional,
 )
 
 from aiohttp.web import Application
@@ -35,7 +37,7 @@ class PrometheusExporterScript(Script):
 
     registry: MetricsRegistry
 
-    def __init__(self, stdout=None, stderr=None, loop=None):
+    def __init__(self, stdout: Optional[IO] = None, stderr: Optional[IO] = None):
         super().__init__(stdout=stdout, stderr=stderr)
         self.registry = MetricsRegistry()
 

@@ -2,6 +2,7 @@
 
 from collections import namedtuple
 from typing import (
+    Any,
     Dict,
     Iterable,
     NamedTuple,
@@ -46,10 +47,12 @@ class MetricConfig(
 ):
     """Configuration for a metric."""
 
-    def __new__(cls, name, description, typ, config):
-        if typ not in METRIC_TYPES:
-            raise InvalidMetricType(name, typ)
-        return super().__new__(cls, name, description, typ, config)
+    def __new__(
+        cls, name: str, description: str, metric_type: str, config: Dict[str, Any]
+    ):
+        if metric_type not in METRIC_TYPES:
+            raise InvalidMetricType(name, metric_type)
+        return super().__new__(cls, name, description, metric_type, config)
 
 
 class InvalidMetricType(Exception):
