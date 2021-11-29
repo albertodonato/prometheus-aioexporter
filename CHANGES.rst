@@ -3,6 +3,8 @@
 
 - Drop explicit passing of asyncio loop.
 - Update project config.
+- Add ``--metrics-path`` option (fixes #4).
+- Add ``prometheus-aioexporter-sample`` script.
 
 
 1.6.3 - 2020-09-13
