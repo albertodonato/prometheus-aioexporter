@@ -71,6 +71,31 @@ class TestPrometheusExporter:
         assert "HELP test_gauge A test gauge" in text
         assert "test_gauge 12.3" in text
 
+    async def test_metrics_different_path(self, aiohttp_client, registry):
+        """The metrics path can be changed."""
+        exporter = PrometheusExporter(
+            "test-app",
+            "A test application",
+            "localhost",
+            8000,
+            registry,
+            metrics_path="/other-path",
+        )
+        metrics = registry.create_metrics(
+            [MetricConfig("test_gauge", "A test gauge", "gauge", {})]
+        )
+        metrics["test_gauge"].set(12.3)
+        client = await aiohttp_client(exporter.app)
+        request = await client.request("GET", "/other-path")
+        assert request.status == 200
+        assert request.content_type == "text/plain"
+        text = await request.text()
+        assert "HELP test_gauge A test gauge" in text
+        assert "test_gauge 12.3" in text
+        # the /metrics path doesn't exist
+        request = await client.request("GET", "/metrics")
+        assert request.status == 404
+
     async def test_metrics_update_handler(self, aiohttp_client, exporter, registry):
         """set_metric_update_handler sets a handler called with metrics."""
         args = []

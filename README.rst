@@ -32,7 +32,7 @@ An example usage is the following:
 
         def configure_argument_parser(self, parser):
             # Additional arguments to the script
-            parser.add_argument('an-option', help='an option')
+            parser.add_argument("an-option", help="an option")
             # ...
 
         def configure(self, args):
@@ -64,27 +64,30 @@ Exporter command-line
     optional arguments:
       -h, --help            show this help message and exit
       -H HOST [HOST ...], --host HOST [HOST ...]
-                            host addresses to bind (default: localhost)
+                            host addresses to bind (default: ['localhost'])
       -p PORT, --port PORT  port to run the webserver on (default: 9090)
+      --metrics-path METRICS_PATH
+                            path under which metrics are exposed (default: /metrics)
       -L {CRITICAL,ERROR,WARNING,INFO,DEBUG}, --log-level {CRITICAL,ERROR,WARNING,INFO,DEBUG}
                             minimum level for log messages (default: WARNING)
       --process-stats       include process stats in metrics (default: False)
+
 
 Further options can be added by implementing ``configure_argument_parser()``,
 which receives the ``argparse.ArgumentParser`` instance used by the script.
 
 The ``script`` variable from the example above can be referenced in
-``setup.py`` to generate the script, like
+``setup.cfg`` to generate the script, like
 
-.. code:: python
+.. code:: ini
 
-    setup(
-        ...,
-        entry_points={'console_scripts': ['script = path.to.script:script']},
-        ...)
+   [options.entry_points]
+   console_scripts =
+       script = path.to.script:script
 
-The ``name`` and ``description`` of the exporter can be customized by
-setting the respective attributes in the script class.
+
+The ``name`` and ``description`` of the exporter can be customized by setting
+the respective attributes in the script class.
 
 
 Startup configuration
@@ -103,11 +106,11 @@ with a list of ``MetricConfig``\s. This is typically done in ``configure()``:
 
 .. code:: python
 
-    def configure(self, args):
+    def configure(self, args: argparse.Namespace):
         # ...
         self.create_metrics(
-            [MetricConfig('metric1', 'a metric', 'gauge', {}),
-             MetricConfig('metric2', 'another metric', 'counter', {})])
+            [MetricConfig("metric1", "a metric", "gauge", {}),
+             MetricConfig("metric2", "another metric", "counter", {})])
 
 
 Web application setup
@@ -130,11 +133,15 @@ coroutine and is called with a dict mapping metric names to metric objects:
 
     async def on_application_startup(self, application):
         # ...
-        application['exporter'].set_metric_update_handler(self._update_handler)
+        application["exporter"].set_metric_update_handler(self._update_handler)
 
     async def _update_handler(self, metrics):
         for name, metric in metrics.items():
             metric.set(...)
+
+
+See ``prometheus_aioexporter.sample`` for a complete example (the script can be
+run as ``prometheus-aioexporter-sample``).
 
 
 .. _Prometheus: https://prometheus.io/

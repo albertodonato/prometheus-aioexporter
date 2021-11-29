@@ -35,6 +35,7 @@ class PrometheusExporter:
     port: int
     register: MetricsRegistry
     app: Application
+    metrics_path: str
 
     _update_handler: Optional[UpdateHandler] = None
 
@@ -45,12 +46,14 @@ class PrometheusExporter:
         hosts: List[str],
         port: int,
         registry: MetricsRegistry,
+        metrics_path: str = "/metrics",
     ):
         self.name = name
         self.description = description
         self.hosts = hosts
         self.port = port
         self.registry = registry
+        self.metrics_path = metrics_path
         self.app = self._make_application()
 
     def set_metric_update_handler(self, handler: UpdateHandler):
@@ -80,7 +83,7 @@ class PrometheusExporter:
         app = Application()
         app["exporter"] = self
         app.router.add_get("/", self._handle_home)
-        app.router.add_get("/metrics", self._handle_metrics)
+        app.router.add_get(self.metrics_path, self._handle_metrics)
         app.on_startup.append(self._log_startup_message)
         return app
 
@@ -108,7 +111,7 @@ class PrometheusExporter:
                 <h1>{title}</h1>
                 <p>
                   Metric are exported at the
-                  <a href="./metrics">/metrics</a> endpoint.
+                  <a href=".{self.metrics_path}">{self.metrics_path}</a> endpoint.
                 </p>
               </body>
             </html>

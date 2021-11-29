@@ -5,6 +5,7 @@ skip_covered = true
 
 [tool.coverage.run]
 source = ["prometheus_aioexporter"]
+omit = ["prometheus_aioexporter/sample.py"]
 
 [tool.isort]
 combine_as_imports = true

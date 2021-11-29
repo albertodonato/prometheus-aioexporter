@@ -4,7 +4,6 @@ import argparse
 import logging
 import sys
 from typing import (
-    ClassVar,
     Dict,
     IO,
     Iterable,
@@ -29,11 +28,14 @@ from .web import PrometheusExporter
 class PrometheusExporterScript(Script):
     """Expose metrics to Prometheus."""
 
-    # Name of the script, can be set by subsclasses.
-    name: ClassVar[str] = "prometheus-exporter"
+    #: Name of the script, can be set by subsclasses.
+    name = "prometheus-exporter"
 
     # The defualt port for the exporter, can be changed by subclasses.
-    default_port: int = 9090
+    default_port = 9090
+
+    # The default path under which metrics are exposed.
+    default_metrics_path = "/metrics"
 
     registry: MetricsRegistry
 
@@ -116,6 +118,11 @@ class PrometheusExporterScript(Script):
             help="port to run the webserver on",
         )
         parser.add_argument(
+            "--metrics-path",
+            default=self.default_metrics_path,
+            help="path under which metrics are exposed",
+        )
+        parser.add_argument(
             "-L",
             "--log-level",
             default="WARNING",
@@ -158,7 +165,12 @@ class PrometheusExporterScript(Script):
     def _get_exporter(self, args: argparse.Namespace) -> PrometheusExporter:
         """Return a :class:`PrometheusExporter` configured with args."""
         exporter = PrometheusExporter(
-            self.name, self.description, args.host, args.port, self.registry
+            self.name,
+            self.description,
+            args.host,
+            args.port,
+            self.registry,
+            metrics_path=args.metrics_path,
         )
         exporter.app.on_startup.append(self.on_application_startup)
         exporter.app.on_shutdown.append(self.on_application_shutdown)

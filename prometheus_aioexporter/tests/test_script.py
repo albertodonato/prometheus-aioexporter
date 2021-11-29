@@ -71,6 +71,13 @@ class TestPrometheusExporterScript:
         ]
         mock_setup_logger.assert_has_calls(calls)
 
+    def test_change_metrics_path(self, mocker):
+        """The path under which metrics are exposed can be changed."""
+        script = SampleScript()
+        args = script.get_parser().parse_args(["--metrics-path", "/other-path"])
+        exporter = script._get_exporter(args)
+        assert exporter.metrics_path == "/other-path"
+
     def test_include_process_stats(self, mocker):
         """The script can include process stats in metrics."""
         mocker.patch("prometheus_aioexporter.web.PrometheusExporter.run")
