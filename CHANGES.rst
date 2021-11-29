@@ -1,3 +1,10 @@
+1.6.4 - 2021-11-29
+==================
+
+- Drop explicit passing of asyncio loop.
+- Update project config.
+
+
 1.6.3 - 2020-09-13
 ==================
 
