@@ -1,12 +1,10 @@
 """Helpers around prometheus-client to create and register metrics."""
 
 from collections import namedtuple
+from collections.abc import Iterable
 from typing import (
     Any,
-    Dict,
-    Iterable,
     NamedTuple,
-    Optional,
 )
 
 from prometheus_client import (
@@ -20,17 +18,18 @@ from prometheus_client import (
     Metric,
     Summary,
 )
+from prometheus_client.registry import Collector
 
 
 class MetricType(NamedTuple):
     """Details about a metric type."""
 
     cls: Metric
-    options: Dict[str, str] = {}
+    options: dict[str, str] = {}
 
 
 # Map metric types to their MetricTypes
-METRIC_TYPES: Dict[str, MetricType] = {
+METRIC_TYPES: dict[str, MetricType] = {
     "counter": MetricType(cls=Counter, options={"labels": "labelnames"}),
     "enum": MetricType(cls=Enum, options={"labels": "labelnames", "states": "states"}),
     "gauge": MetricType(cls=Gauge, options={"labels": "labelnames"}),
@@ -48,8 +47,8 @@ class MetricConfig(
     """Configuration for a metric."""
 
     def __new__(
-        cls, name: str, description: str, metric_type: str, config: Dict[str, Any]
-    ):
+        cls, name: str, description: str, metric_type: str, config: dict[str, Any]
+    ) -> "MetricConfig":
         if metric_type not in METRIC_TYPES:
             raise InvalidMetricType(name, metric_type)
         return super().__new__(cls, name, description, metric_type, config)
@@ -70,19 +69,19 @@ class MetricsRegistry:
 
     registry: CollectorRegistry
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.registry = CollectorRegistry(auto_describe=True)
-        self._metrics: Dict[str, Metric] = {}
+        self._metrics: dict[str, Metric] = {}
 
-    def create_metrics(self, configs: Iterable[MetricConfig]) -> Dict[str, Metric]:
+    def create_metrics(self, configs: Iterable[MetricConfig]) -> dict[str, Metric]:
         """Create Prometheus metrics from a list of MetricConfigs."""
-        metrics: Dict[str, Metric] = {
+        metrics: dict[str, Metric] = {
             config.name: self._register_metric(config) for config in configs
         }
         self._metrics.update(metrics)
         return metrics
 
-    def get_metric(self, name: str, labels: Optional[Dict[str, str]] = None) -> Metric:
+    def get_metric(self, name: str, labels: dict[str, str] | None = None) -> Metric:
         """Return a metric, optionally configured with labels."""
         metric = self._metrics[name]
         if labels:
@@ -90,11 +89,11 @@ class MetricsRegistry:
 
         return metric
 
-    def get_metrics(self) -> Dict[str, Metric]:
+    def get_metrics(self) -> dict[str, Metric]:
         """Return a dict mapping names to metrics."""
         return self._metrics.copy()
 
-    def register_additional_collector(self, collector):
+    def register_additional_collector(self, collector: Collector) -> None:
         """Registrer an additional collector or metric.
 
         Metric(s) for the collector will not be include in the result of
