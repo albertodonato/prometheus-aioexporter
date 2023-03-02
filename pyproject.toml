@@ -6,7 +6,6 @@ requires = [
 
 [project]
 name = "prometheus-aioexporter"
-version = "1.6.4"
 description = "Asyncio library for creating Prometheus exporters"
 readme = "README.rst"
 keywords = [
@@ -32,9 +31,11 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+dynamic = [
+  "version",
+]
 dependencies = [
   "aiohttp>=3",
-  "packaging",
   "prometheus-client>=0.4",
   "toolrack>=2.1",
 ]
@@ -47,11 +48,13 @@ testing = [
 ]
 [project.urls]
 changelog = "https://github.com/albertodonato/prometheus-aioexporter/blob/main/CHANGES.rst"
-documentation = "https://readthedocs.org/projects/prometheus-aioexporter/"
 homepage = "https://github.com/albertodonato/prometheus-aioexporter"
 repository = "https://github.com/albertodonato/prometheus-aioexporter"
 [project.scripts]
 prometheus-aioexporter-sample = "prometheus_aioexporter.sample:script"
+
+[tool.setuptools.dynamic]
+version = {attr = "prometheus_aioexporter.__version__"}
 
 [tool.setuptools.packages.find]
 include = ["prometheus_aioexporter*"]

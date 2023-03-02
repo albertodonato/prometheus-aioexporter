@@ -1,8 +1,5 @@
 """Asyncio library for creating Prometheus exporters."""
 
-from packaging.version import parse
-from pkg_resources import get_distribution
-
 from .metric import (
     MetricConfig,
     MetricsRegistry,
@@ -16,4 +13,4 @@ __all__ = [
     "PrometheusExporterScript",
 ]
 
-__version__ = parse(get_distribution("prometheus-aioexporter").version)
+__version__ = "1.7.0"
