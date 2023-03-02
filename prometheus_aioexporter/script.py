@@ -1,14 +1,10 @@
 """Run a web server providing a Prometheus metrics endpoint."""
 
 import argparse
+from collections.abc import Iterable
 import logging
 import sys
-from typing import (
-    Dict,
-    IO,
-    Iterable,
-    Optional,
-)
+from typing import IO
 
 from aiohttp.web import Application
 from prometheus_client import (
@@ -25,7 +21,7 @@ from .metric import (
 from .web import PrometheusExporter
 
 
-class PrometheusExporterScript(Script):
+class PrometheusExporterScript(Script):  # type: ignore
     """Expose metrics to Prometheus."""
 
     #: Name of the script, can be set by subsclasses.
@@ -39,7 +35,9 @@ class PrometheusExporterScript(Script):
 
     registry: MetricsRegistry
 
-    def __init__(self, stdout: Optional[IO] = None, stderr: Optional[IO] = None):
+    def __init__(
+        self, stdout: IO[bytes] | None = None, stderr: IO[bytes] | None = None
+    ) -> None:
         super().__init__(stdout=stdout, stderr=stderr)
         self.registry = MetricsRegistry()
 
@@ -57,7 +55,7 @@ class PrometheusExporterScript(Script):
         """A logger for the script."""
         return logging.getLogger(name=self.name)
 
-    def configure_argument_parser(self, parser: argparse.ArgumentParser):
+    def configure_argument_parser(self, parser: argparse.ArgumentParser) -> None:
         """Add configuration to the ArgumentParser.
 
         Subclasses can implement this to add options to the ArgumentParser for
@@ -65,7 +63,7 @@ class PrometheusExporterScript(Script):
 
         """
 
-    async def on_application_startup(self, application: Application):
+    async def on_application_startup(self, application: Application) -> None:
         """Handler run at Application startup.
 
         This must be a coroutine.
@@ -75,7 +73,7 @@ class PrometheusExporterScript(Script):
 
         """
 
-    async def on_application_shutdown(self, application: Application):
+    async def on_application_shutdown(self, application: Application) -> None:
         """Handler run at Application shutdown.
 
         This must be a coroutine.
@@ -85,7 +83,7 @@ class PrometheusExporterScript(Script):
 
         """
 
-    def configure(self, args: argparse.Namespace):
+    def configure(self, args: argparse.Namespace) -> None:
         """Perform additional confguration steps at script startup.
 
         Subclasses can implement this.
@@ -94,7 +92,7 @@ class PrometheusExporterScript(Script):
 
     def create_metrics(
         self, metric_configs: Iterable[MetricConfig]
-    ) -> Dict[str, Metric]:
+    ) -> dict[str, Metric]:
         """Create and register metrics from a list of MetricConfigs."""
         return self.registry.create_metrics(metric_configs)
 
@@ -137,14 +135,14 @@ class PrometheusExporterScript(Script):
         self.configure_argument_parser(parser)
         return parser
 
-    def main(self, args: argparse.Namespace):
+    def main(self, args: argparse.Namespace) -> None:
         self._setup_logging(args.log_level)
         self._configure_registry(include_process_stats=args.process_stats)
         self.configure(args)
         exporter = self._get_exporter(args)
         exporter.run()
 
-    def _setup_logging(self, log_level: str):
+    def _setup_logging(self, log_level: str) -> None:
         """Setup logging for the application and aiohttp."""
         level = getattr(logging, log_level)
         names = (
@@ -157,7 +155,7 @@ class PrometheusExporterScript(Script):
         for name in names:
             setup_logger(name=name, stream=sys.stderr, level=level)
 
-    def _configure_registry(self, include_process_stats: bool = False):
+    def _configure_registry(self, include_process_stats: bool = False) -> None:
         """Configure the MetricRegistry."""
         if include_process_stats:
             self.registry.register_additional_collector(ProcessCollector(registry=None))

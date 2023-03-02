@@ -1,13 +1,11 @@
 """AioHTTP application for exposing metrics to Prometheus."""
 
-from textwrap import dedent
-from typing import (
+from collections.abc import (
     Awaitable,
     Callable,
     Iterable,
-    List,
-    Optional,
 )
+from textwrap import dedent
 
 from aiohttp.web import (
     Application,
@@ -31,23 +29,23 @@ class PrometheusExporter:
 
     name: str
     descrption: str
-    hosts: List[str]
+    hosts: list[str]
     port: int
     register: MetricsRegistry
     app: Application
     metrics_path: str
 
-    _update_handler: Optional[UpdateHandler] = None
+    _update_handler: UpdateHandler | None = None
 
     def __init__(
         self,
         name: str,
         description: str,
-        hosts: List[str],
+        hosts: list[str],
         port: int,
         registry: MetricsRegistry,
         metrics_path: str = "/metrics",
-    ):
+    ) -> None:
         self.name = name
         self.description = description
         self.hosts = hosts
@@ -56,7 +54,7 @@ class PrometheusExporter:
         self.metrics_path = metrics_path
         self.app = self._make_application()
 
-    def set_metric_update_handler(self, handler: UpdateHandler):
+    def set_metric_update_handler(self, handler: UpdateHandler) -> None:
         """Set a handler to update metrics.
 
         The provided coroutine function is called at every request with a dict
@@ -68,7 +66,7 @@ class PrometheusExporter:
         """
         self._update_handler = handler
 
-    def run(self):
+    def run(self) -> None:
         """Run the :class:`aiohttp.web.Application` for the exporter."""
         run_app(
             self.app,
@@ -87,7 +85,7 @@ class PrometheusExporter:
         app.on_startup.append(self._log_startup_message)
         return app
 
-    async def _log_startup_message(self, app: Application):
+    async def _log_startup_message(self, app: Application) -> None:
         """Log message about application startup."""
         for host in self.hosts:
             if ":" in host:

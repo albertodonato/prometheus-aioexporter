@@ -2,8 +2,8 @@ from io import StringIO
 import logging
 from unittest import mock
 
-from ..metric import MetricConfig
-from ..script import PrometheusExporterScript
+from prometheus_aioexporter.metric import MetricConfig
+from prometheus_aioexporter.script import PrometheusExporterScript
 
 
 class SampleScript(PrometheusExporterScript):
