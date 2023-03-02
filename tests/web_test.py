@@ -2,11 +2,11 @@ from unittest import mock
 
 import pytest
 
-from ..metric import (
+from prometheus_aioexporter.metric import (
     MetricConfig,
     MetricsRegistry,
 )
-from ..web import PrometheusExporter
+from prometheus_aioexporter.web import PrometheusExporter
 
 
 @pytest.fixture

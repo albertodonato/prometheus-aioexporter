@@ -1,6 +1,6 @@
 import pytest
 
-from ..metric import (
+from prometheus_aioexporter.metric import (
     InvalidMetricType,
     MetricConfig,
     MetricsRegistry,
