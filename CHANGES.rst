@@ -1,3 +1,11 @@
+1.7.0 - 2021-03-02
+==================
+
+- Require Python 3.10 or later.
+- Reqork project setup, move tests.
+- Drop ``setup.{py,cfg}``, extract ``tox.ini`` config.
+
+
 1.6.4 - 2021-11-29
 ==================
 

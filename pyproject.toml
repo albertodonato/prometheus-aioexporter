@@ -67,6 +67,7 @@ from_first = false
 include_trailing_comma = true
 multi_line_output = 3
 order_by_type = false
+profile = "black"
 use_parentheses = true
 
 [tool.flake8]
