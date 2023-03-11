@@ -55,7 +55,9 @@ class PrometheusExporterScript(Script):  # type: ignore
         """A logger for the script."""
         return logging.getLogger(name=self.name)
 
-    def configure_argument_parser(self, parser: argparse.ArgumentParser) -> None:
+    def configure_argument_parser(
+        self, parser: argparse.ArgumentParser
+    ) -> None:
         """Add configuration to the ArgumentParser.
 
         Subclasses can implement this to add options to the ArgumentParser for
@@ -158,7 +160,9 @@ class PrometheusExporterScript(Script):  # type: ignore
     def _configure_registry(self, include_process_stats: bool = False) -> None:
         """Configure the MetricRegistry."""
         if include_process_stats:
-            self.registry.register_additional_collector(ProcessCollector(registry=None))
+            self.registry.register_additional_collector(
+                ProcessCollector(registry=None)
+            )
 
     def _get_exporter(self, args: argparse.Namespace) -> PrometheusExporter:
         """Return a :class:`PrometheusExporter` configured with args."""

@@ -96,7 +96,9 @@ class TestPrometheusExporter:
         request = await client.request("GET", "/metrics")
         assert request.status == 404
 
-    async def test_metrics_update_handler(self, aiohttp_client, exporter, registry):
+    async def test_metrics_update_handler(
+        self, aiohttp_client, exporter, registry
+    ):
         """set_metric_update_handler sets a handler called with metrics."""
         args = []
 

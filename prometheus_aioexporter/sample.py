@@ -19,8 +19,12 @@ class SampleScript(PrometheusExporterScript):
     def configure(self, args: Namespace) -> None:
         self.create_metrics(
             [
-                MetricConfig("a_gauge", "a gauge", "gauge", {"labels": ["foo", "bar"]}),
-                MetricConfig("a_counter", "a counter", "counter", {"labels": ["baz"]}),
+                MetricConfig(
+                    "a_gauge", "a gauge", "gauge", {"labels": ["foo", "bar"]}
+                ),
+                MetricConfig(
+                    "a_counter", "a counter", "counter", {"labels": ["baz"]}
+                ),
             ]
         )
 

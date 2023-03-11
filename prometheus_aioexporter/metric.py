@@ -31,7 +31,9 @@ class MetricType(NamedTuple):
 # Map metric types to their MetricTypes
 METRIC_TYPES: dict[str, MetricType] = {
     "counter": MetricType(cls=Counter, options={"labels": "labelnames"}),
-    "enum": MetricType(cls=Enum, options={"labels": "labelnames", "states": "states"}),
+    "enum": MetricType(
+        cls=Enum, options={"labels": "labelnames", "states": "states"}
+    ),
     "gauge": MetricType(cls=Gauge, options={"labels": "labelnames"}),
     "histogram": MetricType(
         cls=Histogram, options={"labels": "labelnames", "buckets": "buckets"}
@@ -47,7 +49,11 @@ class MetricConfig(
     """Configuration for a metric."""
 
     def __new__(
-        cls, name: str, description: str, metric_type: str, config: dict[str, Any]
+        cls,
+        name: str,
+        description: str,
+        metric_type: str,
+        config: dict[str, Any],
     ) -> "MetricConfig":
         if metric_type not in METRIC_TYPES:
             raise InvalidMetricType(name, metric_type)
@@ -61,7 +67,9 @@ class InvalidMetricType(Exception):
         self.name = name
         self.invalid_type = invalid_type
         type_list = ", ".join(sorted(METRIC_TYPES))
-        super().__init__(f"Invalid type for {self.name}: must be one of {type_list}")
+        super().__init__(
+            f"Invalid type for {self.name}: must be one of {type_list}"
+        )
 
 
 class MetricsRegistry:
@@ -73,7 +81,9 @@ class MetricsRegistry:
         self.registry = CollectorRegistry(auto_describe=True)
         self._metrics: dict[str, Metric] = {}
 
-    def create_metrics(self, configs: Iterable[MetricConfig]) -> dict[str, Metric]:
+    def create_metrics(
+        self, configs: Iterable[MetricConfig]
+    ) -> dict[str, Metric]:
         """Create Prometheus metrics from a list of MetricConfigs."""
         metrics: dict[str, Metric] = {
             config.name: self._register_metric(config) for config in configs
@@ -81,7 +91,9 @@ class MetricsRegistry:
         self._metrics.update(metrics)
         return metrics
 
-    def get_metric(self, name: str, labels: dict[str, str] | None = None) -> Metric:
+    def get_metric(
+        self, name: str, labels: dict[str, str] | None = None
+    ) -> Metric:
         """Return a metric, optionally configured with labels."""
         metric = self._metrics[name]
         if labels:
