@@ -1,7 +1,10 @@
 """Helpers around prometheus-client to create and register metrics."""
 
-from collections import namedtuple
 from collections.abc import Iterable
+from dataclasses import (
+    dataclass,
+    field,
+)
 from typing import (
     Any,
     NamedTuple,
@@ -25,7 +28,7 @@ class MetricType(NamedTuple):
     """Details about a metric type."""
 
     cls: Metric
-    options: dict[str, str] = {}
+    options: dict[str, str] = field(default_factory=dict)
 
 
 # Map metric types to their MetricTypes
@@ -43,21 +46,18 @@ METRIC_TYPES: dict[str, MetricType] = {
 }
 
 
-class MetricConfig(
-    namedtuple("MetricConfig", ["name", "description", "type", "config"])
-):
+@dataclass
+class MetricConfig:
     """Configuration for a metric."""
 
-    def __new__(
-        cls,
-        name: str,
-        description: str,
-        metric_type: str,
-        config: dict[str, Any],
-    ) -> "MetricConfig":
-        if metric_type not in METRIC_TYPES:
-            raise InvalidMetricType(name, metric_type)
-        return super().__new__(cls, name, description, metric_type, config)
+    name: str
+    description: str
+    type: str
+    config: dict[str, Any]
+
+    def __post_init__(self) -> None:
+        if self.type not in METRIC_TYPES:
+            raise InvalidMetricType(self.name, self.type)
 
 
 class InvalidMetricType(Exception):
