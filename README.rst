@@ -120,11 +120,14 @@ with a list of ``MetricConfig``\s. This is typically done in ``configure()``:
 
 .. code:: python
 
-    def configure(self, args: argparse.Namespace):
+    def configure(self, args: argparse.Namespace) -> None:
         # ...
         self.create_metrics(
-            [MetricConfig("metric1", "a metric", "gauge", {}),
-             MetricConfig("metric2", "another metric", "counter", {})])
+            [
+                MetricConfig("metric1", "a metric", "gauge"),
+                MetricConfig("metric2", "another metric", "counter", labels=("l1", "l2")),
+            ]
+        )
 
 
 Web application setup
@@ -145,11 +148,11 @@ coroutine and is called with a dict mapping metric names to metric objects:
 
 .. code:: python
 
-    async def on_application_startup(self, application):
+    async def on_application_startup(self, application: aiohttp.web.Application) -> None:
         # ...
         application["exporter"].set_metric_update_handler(self._update_handler)
 
-    async def _update_handler(self, metrics):
+    async def _update_handler(self, metrics: dict[str, prometheus_client.metrics.MetricWrapperBase]):
         for name, metric in metrics.items():
             metric.set(...)
 

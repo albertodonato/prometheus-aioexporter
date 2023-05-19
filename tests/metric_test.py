@@ -1,6 +1,12 @@
+from typing import (
+    Any,
+    Callable,
+)
+
+from prometheus_client.metrics import MetricWrapperBase
 import pytest
 
-from prometheus_aioexporter.metric import (
+from prometheus_aioexporter._metric import (
     InvalidMetricType,
     MetricConfig,
     MetricsRegistry,
@@ -11,19 +17,23 @@ class TestMetricConfig:
     def test_invalid_metric_type(self):
         """An invalid metric type raises an error."""
         with pytest.raises(InvalidMetricType) as error:
-            MetricConfig("m1", "desc1", "unknown", {})
+            MetricConfig("m1", "desc1", "unknown")
         assert str(error.value) == (
             "Invalid type for m1: must be one of counter, enum, "
             "gauge, histogram, info, summary"
         )
+
+    def test_labels_sorted(self) -> None:
+        config = MetricConfig("m", "desc", "counter", labels=["foo", "bar"])
+        assert config.labels == ("bar", "foo")
 
 
 class TestMetricsRegistry:
     def test_create_metrics(self):
         """Prometheus metrics are created from the specified config."""
         configs = [
-            MetricConfig("m1", "desc1", "counter", {}),
-            MetricConfig("m2", "desc2", "histogram", {}),
+            MetricConfig("m1", "desc1", "counter"),
+            MetricConfig("m2", "desc2", "histogram"),
         ]
         metrics = MetricsRegistry().create_metrics(configs)
         assert len(metrics) == 2
@@ -33,7 +43,9 @@ class TestMetricsRegistry:
     def test_create_metrics_with_config(self):
         """Metric configs are applied."""
         configs = [
-            MetricConfig("m1", "desc1", "histogram", {"buckets": [10, 20]})
+            MetricConfig(
+                "m1", "desc1", "histogram", config={"buckets": [10, 20]}
+            )
         ]
         metrics = MetricsRegistry().create_metrics(configs)
         # The two specified bucket plus +Inf
@@ -41,7 +53,9 @@ class TestMetricsRegistry:
 
     def test_create_metrics_config_ignores_unknown(self):
         """Unknown metric configs are ignored and don't cause an error."""
-        configs = [MetricConfig("m1", "desc1", "gauge", {"unknown": "value"})]
+        configs = [
+            MetricConfig("m1", "desc1", "gauge", config={"unknown": "value"})
+        ]
         metrics = MetricsRegistry().create_metrics(configs)
         assert len(metrics) == 1
 
@@ -50,8 +64,8 @@ class TestMetricsRegistry:
         registry = MetricsRegistry()
         metrics = registry.create_metrics(
             [
-                MetricConfig("metric1", "A test gauge", "gauge", {}),
-                MetricConfig("metric2", "A test histogram", "histogram", {}),
+                MetricConfig("metric1", "A test gauge", "gauge"),
+                MetricConfig("metric2", "A test histogram", "histogram"),
             ]
         )
         assert registry.get_metrics() == metrics
@@ -60,7 +74,10 @@ class TestMetricsRegistry:
         """get_metric returns a metric."""
         configs = [
             MetricConfig(
-                "m", "A test gauge", "gauge", {"labels": ["l1", "l2"]}
+                "m",
+                "A test gauge",
+                "gauge",
+                labels=["l1", "l2"],
             )
         ]
         registry = MetricsRegistry()
@@ -72,9 +89,7 @@ class TestMetricsRegistry:
     def test_get_metric_with_labels(self):
         """get_metric returns a metric configured with labels."""
         configs = [
-            MetricConfig(
-                "m", "A test gauge", "gauge", {"labels": ["l1", "l2"]}
-            )
+            MetricConfig("m", "A test gauge", "gauge", labels=("l1", "l2"))
         ]
         registry = MetricsRegistry()
         registry.create_metrics(configs)
@@ -82,7 +97,7 @@ class TestMetricsRegistry:
         assert metric._labelvalues == ("v1", "v2")
 
     @pytest.mark.parametrize(
-        "typ,params,action,text",
+        "metric_type,config,action,text",
         [
             (
                 "counter",
@@ -117,12 +132,17 @@ class TestMetricsRegistry:
             ),
         ],
     )
-    def test_generate_metrics(self, typ, params, action, text):
-        """generate_metrics returns text with metrics values."""
+    def test_generate_metrics(
+        self,
+        metric_type: str,
+        config: dict[str, Any],
+        action: Callable[[MetricWrapperBase], None],
+        text: str,
+    ) -> None:
         registry = MetricsRegistry()
-        name = "test_" + typ
+        name = "test_" + metric_type
         metrics = registry.create_metrics(
-            [MetricConfig(name, "A test metric", typ, params)]
+            [MetricConfig(name, "A test metric", metric_type, config=config)]
         )
         action(metrics[name])
         assert text in registry.generate_metrics().decode("utf-8")
