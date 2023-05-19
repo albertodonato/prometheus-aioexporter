@@ -3,7 +3,7 @@ Asyncio library for creating Prometheus exporters
 
 |Latest Version| |Build Status| |Coverage Status|
 
-prometheus-aioexporter is an aysncio-powered library to simplify writing
+``prometheus-aioexporter`` is an aysncio-based library to simplify writing
 Prometheus_ exporters.
 
 Exporters are usually implemented as small daemons that expose metrics
@@ -30,22 +30,30 @@ An example usage is the following:
     class MyExporter(PrometheusExporterScript):
         """My Prometheus exporter."""
 
-        def configure_argument_parser(self, parser):
+        name = "my-exporter"
+
+        def configure_argument_parser(
+            self, parser: argparse.ArgumentParser
+        ) -> None:
             # Additional arguments to the script
-            parser.add_argument("an-option", help="an option")
+            parser.add_argument("--custom-option", help="a custom option")
             # ...
 
-        def configure(self, args):
+        def configure(self, args: argparse.Namespace) -> None:
             # Save attributes that are needed for later
             self.data = do_stuff()
             # ...
 
-        async def on_application_startup(self, application):
+        async def on_application_startup(
+            self, application: aiohttp.web.Application
+        ) -> None:
             # Start other asyncio tasks at application startup
             use(self.data)
             # ...
 
-        async def on_application_shutdown(self, application):
+        async def on_application_shutdown(
+            self, application: aiohttp.web.Application
+        ) -> None:
             # Stop other asyncio tasks at application shutdown
             use(self.data)
             # ...
@@ -77,17 +85,16 @@ Further options can be added by implementing ``configure_argument_parser()``,
 which receives the ``argparse.ArgumentParser`` instance used by the script.
 
 The ``script`` variable from the example above can be referenced in
-``setup.cfg`` to generate the script, like
+``pyproject.toml`` to generate the script, like
 
-.. code:: ini
+.. code:: toml
 
-   [options.entry_points]
-   console_scripts =
-       script = path.to.script:script
+    [project.scripts]
+    my-exporter = "path.to.script:script"
 
 
-The ``name`` and ``description`` of the exporter can be customized by setting
-the respective attributes in the script class.
+The ``description`` of the exporter can be customized by setting the docstring
+in the script class.
 
 
 Startup configuration

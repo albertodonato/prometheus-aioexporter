@@ -104,12 +104,14 @@ class PrometheusExporter:
             <html>
               <head>
                 <title>{title}</title>
+                <meta name="generator" content="{self.name}">
               </head>
               <body>
                 <h1>{title}</h1>
                 <p>
                   Metric are exported at the
-                  <a href=".{self.metrics_path}">{self.metrics_path}</a> endpoint.
+                  <a href=".{self.metrics_path}">{self.metrics_path}</a>
+                  endpoint.
                 </p>
               </body>
             </html>
