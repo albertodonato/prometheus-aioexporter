@@ -3,8 +3,13 @@
 import argparse
 from collections.abc import Iterable
 import logging
+import ssl
+from ssl import SSLContext
 import sys
-from typing import IO
+from typing import (
+    IO,
+    Optional,
+)
 
 from aiohttp.web import Application
 from prometheus_client import (
@@ -134,6 +139,24 @@ class PrometheusExporterScript(Script):  # type: ignore
             action="store_true",
             help="include process stats in metrics",
         )
+        parser.add_argument(
+            "--ssl-private-key",
+            type=str,
+            dest="ssl_private_key",
+            help="full path to the ssl private key",
+        )
+        parser.add_argument(
+            "--ssl-public-key",
+            type=str,
+            dest="ssl_public_key",
+            help="full path to the ssl public key",
+        )
+        parser.add_argument(
+            "--ssl-ca",
+            type=str,
+            dest="ssl_ca",
+            help="full path to the ssl certificate authority (CA)",
+        )
         self.configure_argument_parser(parser)
         return parser
 
@@ -164,6 +187,20 @@ class PrometheusExporterScript(Script):  # type: ignore
                 ProcessCollector(registry=None)
             )
 
+    @staticmethod
+    def _configure_ssl(args: argparse.Namespace) -> Optional[SSLContext]:
+        if args.ssl_private_key is None or args.ssl_public_key is None:
+            return None
+        cafile = None
+        if args.ssl_ca:
+            cafile = args.ssl_ca
+        ssl_context = ssl.create_default_context(
+            purpose=ssl.Purpose.CLIENT_AUTH, cafile=cafile
+        )
+        ssl_context.load_cert_chain(args.ssl_public_key, args.ssl_private_key)
+
+        return ssl_context
+
     def _get_exporter(self, args: argparse.Namespace) -> PrometheusExporter:
         """Return a :class:`PrometheusExporter` configured with args."""
         exporter = PrometheusExporter(
@@ -173,6 +210,7 @@ class PrometheusExporterScript(Script):  # type: ignore
             args.port,
             self.registry,
             metrics_path=args.metrics_path,
+            ssl_context=PrometheusExporterScript._configure_ssl(args),
         )
         exporter.app.on_startup.append(self.on_application_startup)
         exporter.app.on_shutdown.append(self.on_application_shutdown)

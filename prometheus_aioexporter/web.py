@@ -5,7 +5,9 @@ from collections.abc import (
     Callable,
     Iterable,
 )
+from ssl import SSLContext
 from textwrap import dedent
+from typing import Optional
 
 from aiohttp.web import (
     Application,
@@ -28,12 +30,13 @@ class PrometheusExporter:
     """Export Prometheus metrics via a web application."""
 
     name: str
-    descrption: str
+    description: str
     hosts: list[str]
     port: int
     register: MetricsRegistry
     app: Application
     metrics_path: str
+    ssl_context: Optional[SSLContext] = None
 
     _update_handler: UpdateHandler | None = None
 
@@ -45,6 +48,7 @@ class PrometheusExporter:
         port: int,
         registry: MetricsRegistry,
         metrics_path: str = "/metrics",
+        ssl_context: Optional[SSLContext] = None,
     ) -> None:
         self.name = name
         self.description = description
@@ -53,6 +57,7 @@ class PrometheusExporter:
         self.registry = registry
         self.metrics_path = metrics_path
         self.app = self._make_application()
+        self.ssl_context = ssl_context
 
     def set_metric_update_handler(self, handler: UpdateHandler) -> None:
         """Set a handler to update metrics.
@@ -74,6 +79,7 @@ class PrometheusExporter:
             port=self.port,
             print=lambda *args, **kargs: None,
             access_log_format='%a "%r" %s %b "%{Referrer}i" "%{User-Agent}i"',
+            ssl_context=self.ssl_context,
         )
 
     def _make_application(self) -> Application:
@@ -90,7 +96,12 @@ class PrometheusExporter:
         for host in self.hosts:
             if ":" in host:
                 host = f"[{host}]"
-            self.app.logger.info(f"Listening on http://{host}:{self.port}")
+            protocol = "http"
+            if self.ssl_context:
+                protocol = "https"
+            self.app.logger.info(
+                f"Listening on {protocol}://{host}:{self.port}"
+            )
 
     async def _handle_home(self, request: Request) -> Response:
         """Home page request handler."""
