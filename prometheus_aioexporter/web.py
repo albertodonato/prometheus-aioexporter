@@ -7,7 +7,6 @@ from collections.abc import (
 )
 from ssl import SSLContext
 from textwrap import dedent
-from typing import Optional
 
 from aiohttp.web import (
     Application,

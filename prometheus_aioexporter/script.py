@@ -1,14 +1,12 @@
 """Run a web server providing a Prometheus metrics endpoint."""
 
 import argparse
+from collections.abc import Iterable
 import logging
 import ssl
-import sys
-from collections.abc import Iterable
 from ssl import SSLContext
-from typing import (
-    IO,
-)
+import sys
+from typing import IO
 
 from aiohttp.web import Application
 from prometheus_client import (
