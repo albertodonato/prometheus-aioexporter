@@ -176,8 +176,10 @@ class PrometheusExporterScript(Script):  # type: ignore
     def _configure_registry(self, include_process_stats: bool = False) -> None:
         """Configure the MetricRegistry."""
         if include_process_stats:
+            # XXX ignore type until
+            # https://github.com/prometheus/client_python/pull/970 is fixed
             self.registry.register_additional_collector(
-                ProcessCollector(registry=None)
+                ProcessCollector(registry=None)  # type: ignore[arg-type]
             )
 
     def _get_ssl_context(
