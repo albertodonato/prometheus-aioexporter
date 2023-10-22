@@ -36,7 +36,7 @@ class PrometheusExporter:
     register: MetricsRegistry
     app: Application
     metrics_path: str
-    ssl_context: Optional[SSLContext] = None
+    ssl_context: SSLContext | None = None
 
     _update_handler: UpdateHandler | None = None
 
@@ -48,7 +48,7 @@ class PrometheusExporter:
         port: int,
         registry: MetricsRegistry,
         metrics_path: str = "/metrics",
-        ssl_context: Optional[SSLContext] = None,
+        ssl_context: SSLContext | None = None,
     ) -> None:
         self.name = name
         self.description = description

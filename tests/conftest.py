@@ -6,7 +6,7 @@ import trustme
 
 @pytest.fixture
 def ca():
-    return trustme.CA()
+    yield trustme.CA()
 
 
 @pytest.fixture
@@ -17,7 +17,7 @@ def tls_ca_path(ca):
 
 @pytest.fixture
 def tls_certificate(ca):
-    return ca.issue_cert("localhost", "127.0.0.1", "::1")
+    yield ca.issue_cert("localhost", "127.0.0.1", "::1")
 
 
 @pytest.fixture
@@ -38,11 +38,11 @@ def tls_private_key_path(tls_certificate):
 def ssl_context(tls_certificate):
     ssl_ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     tls_certificate.configure_cert(ssl_ctx)
-    return ssl_ctx
+    yield ssl_ctx
 
 
 @pytest.fixture
 def ssl_context_server(tls_public_key_path, ca):
     ssl_ctx = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH)
     ca.configure_trust(ssl_ctx)
-    return ssl_ctx
+    yield ssl_ctx
