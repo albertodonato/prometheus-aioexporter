@@ -188,11 +188,13 @@ class PrometheusExporterScript(Script):  # type: ignore
             return None
         cafile = None
         if args.ssl_ca:
-            cafile = args.ssl_ca
+            cafile = args.ssl_ca.name
         ssl_context = ssl.create_default_context(
             purpose=ssl.Purpose.CLIENT_AUTH, cafile=cafile
         )
-        ssl_context.load_cert_chain(args.ssl_public_key, args.ssl_private_key)
+        ssl_context.load_cert_chain(
+            args.ssl_public_key.name, args.ssl_private_key.name
+        )
 
         return ssl_context
 
