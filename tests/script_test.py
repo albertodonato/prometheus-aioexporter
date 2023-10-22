@@ -104,7 +104,7 @@ class TestPrometheusExporterScript:
         assert exporter.ssl_context is None
 
     def test_ssl_components_without_ca(
-            self, script, tls_private_key_path, tls_public_key_path
+        self, script, tls_private_key_path, tls_public_key_path
     ):
         """The path under which metrics are exposed can be changed."""
         args = script.get_parser().parse_args(
@@ -120,7 +120,7 @@ class TestPrometheusExporterScript:
         assert len(exporter.ssl_context.get_ca_certs()) != 1
 
     def test_ssl_components(
-            self, script, tls_private_key_path, tls_ca_path, tls_public_key_path
+        self, script, tls_private_key_path, tls_ca_path, tls_public_key_path
     ):
         """The path under which metrics are exposed can be changed."""
         args = script.get_parser().parse_args(
@@ -143,8 +143,8 @@ class TestPrometheusExporterScript:
         script(["--process-stats"])
         # process stats are present in the registry
         assert (
-                "process_cpu_seconds_total"
-                in script.registry.registry._names_to_collectors
+            "process_cpu_seconds_total"
+            in script.registry.registry._names_to_collectors
         )
 
     def test_get_exporter_registers_handlers(self, script):
@@ -155,12 +155,12 @@ class TestPrometheusExporterScript:
         assert script.on_application_shutdown in exporter.app.on_shutdown
 
     def test_script_run_exporter_ssl(
-            self,
-            mocker,
-            script,
-            ssl_context,
-            tls_private_key_path,
-            tls_public_key_path,
+        self,
+        mocker,
+        script,
+        ssl_context,
+        tls_private_key_path,
+        tls_public_key_path,
     ):
         """The script runs the exporter application."""
         mock_run_app = mocker.patch("prometheus_aioexporter.web.run_app")

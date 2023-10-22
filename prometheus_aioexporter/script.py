@@ -40,8 +40,7 @@ class PrometheusExporterScript(Script):  # type: ignore
     registry: MetricsRegistry
 
     def __init__(
-            self, stdout: IO[bytes] | None = None,
-            stderr: IO[bytes] | None = None
+        self, stdout: IO[bytes] | None = None, stderr: IO[bytes] | None = None
     ) -> None:
         super().__init__(stdout=stdout, stderr=stderr)
         self.registry = MetricsRegistry()
@@ -61,7 +60,7 @@ class PrometheusExporterScript(Script):  # type: ignore
         return logging.getLogger(name=self.name)
 
     def configure_argument_parser(
-            self, parser: argparse.ArgumentParser
+        self, parser: argparse.ArgumentParser
     ) -> None:
         """Add configuration to the ArgumentParser.
 
@@ -98,7 +97,7 @@ class PrometheusExporterScript(Script):  # type: ignore
         """
 
     def create_metrics(
-            self, metric_configs: Iterable[MetricConfig]
+        self, metric_configs: Iterable[MetricConfig]
     ) -> dict[str, Metric]:
         """Create and register metrics from a list of MetricConfigs."""
         return self.registry.create_metrics(metric_configs)
@@ -141,17 +140,17 @@ class PrometheusExporterScript(Script):  # type: ignore
         )
         parser.add_argument(
             "--ssl-private-key",
-            type=argparse.FileType('r'),
+            type=argparse.FileType("r"),
             help="full path to the ssl private key",
         )
         parser.add_argument(
             "--ssl-public-key",
-            type=argparse.FileType('r'),
+            type=argparse.FileType("r"),
             help="full path to the ssl public key",
         )
         parser.add_argument(
             "--ssl-ca",
-            type=argparse.FileType('r'),
+            type=argparse.FileType("r"),
             help="full path to the ssl certificate authority (CA)",
         )
         self.configure_argument_parser(parser)

@@ -73,11 +73,11 @@ class TestPrometheusExporter:
 
     @pytest.mark.parametrize("exporter", [ssl_context, None], indirect=True)
     async def test_homepage(
-            self,
-            ssl_context_server,
-            create_server_client,
-            exporter,
-            aiohttp_client,
+        self,
+        ssl_context_server,
+        create_server_client,
+        exporter,
+        aiohttp_client,
     ):
         """The homepage shows an HTML page."""
         server = await create_server_client(exporter)
@@ -119,7 +119,7 @@ class TestPrometheusExporter:
 
     @pytest.mark.parametrize("ssl_context", [SSLContext(), None])
     async def test_metrics_different_path(
-            self, aiohttp_client, registry, ssl_context
+        self, aiohttp_client, registry, ssl_context
     ):
         """The metrics path can be changed."""
         exporter = PrometheusExporter(
@@ -148,7 +148,7 @@ class TestPrometheusExporter:
 
     @pytest.mark.parametrize("exporter", [ssl_context, None], indirect=True)
     async def test_metrics_update_handler(
-            self, aiohttp_client, exporter, registry
+        self, aiohttp_client, exporter, registry
     ):
         """set_metric_update_handler sets a handler called with metrics."""
         args = []
@@ -171,7 +171,7 @@ class TestPrometheusExporter:
         ["ssl_context", "protocol"], [(ssl_context, "https"), (None, "http")]
     )
     async def test_startup_logger(
-            self, mocker, registry, ssl_context, protocol
+        self, mocker, registry, ssl_context, protocol
     ):
         exporter = PrometheusExporter(
             "test-app",
