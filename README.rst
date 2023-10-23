@@ -14,7 +14,7 @@ Usage
 -----
 
 The library provides a ``PrometheusExporterScript`` class that serves as an
-entry point to create services that export Prometheus metrics via an HTTP
+entry point to create services that export Prometheus metrics via an HTTP(s)
 endpoint.
 
 Creating a new exporter is just a matter of subclassing
@@ -79,6 +79,9 @@ Exporter command-line
       -L {CRITICAL,ERROR,WARNING,INFO,DEBUG}, --log-level {CRITICAL,ERROR,WARNING,INFO,DEBUG}
                             minimum level for log messages (default: WARNING)
       --process-stats       include process stats in metrics (default: False)
+      --ssl-private-key     full path to the ssl private key
+      --ssl-public-key      full path to the ssl public key
+      --ssl-ca              full path to the ssl certificate authority (CA)
 
 
 Further options can be added by implementing ``configure_argument_parser()``,
@@ -86,6 +89,10 @@ which receives the ``argparse.ArgumentParser`` instance used by the script.
 
 The ``script`` variable from the example above can be referenced in
 ``pyproject.toml`` to generate the script, like
+
+In order to serve metrics on the HTTPs endpoint both ``ssl-private-key`` and
+``ssl-public-key`` need to be define. The ssl certificate authority
+(i.e. ``ssl-ca``) is optional.
 
 .. code:: toml
 

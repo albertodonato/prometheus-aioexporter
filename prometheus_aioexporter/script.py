@@ -4,7 +4,6 @@ import argparse
 from collections.abc import Iterable
 import logging
 import ssl
-from ssl import SSLContext
 import sys
 from typing import IO
 
@@ -181,19 +180,23 @@ class PrometheusExporterScript(Script):  # type: ignore
                 ProcessCollector(registry=None)
             )
 
-    def _get_ssl_context(self, args: argparse.Namespace) -> SSLContext | None:
+    def _get_ssl_context(
+        self, args: argparse.Namespace
+    ) -> ssl.SSLContext | None:
         if args.ssl_private_key is None or args.ssl_public_key is None:
             return None
         cafile = None
         if args.ssl_ca:
             cafile = args.ssl_ca.name
+            args.ssl_ca.close()
         ssl_context = ssl.create_default_context(
             purpose=ssl.Purpose.CLIENT_AUTH, cafile=cafile
         )
         ssl_context.load_cert_chain(
             args.ssl_public_key.name, args.ssl_private_key.name
         )
-
+        args.ssl_public_key.close()
+        args.ssl_private_key.close()
         return ssl_context
 
     def _get_exporter(self, args: argparse.Namespace) -> PrometheusExporter:
