@@ -3,6 +3,7 @@
 import argparse
 from collections.abc import Iterable
 import logging
+import ssl
 import sys
 from typing import IO
 
@@ -134,6 +135,21 @@ class PrometheusExporterScript(Script):  # type: ignore
             action="store_true",
             help="include process stats in metrics",
         )
+        parser.add_argument(
+            "--ssl-private-key",
+            type=argparse.FileType("r"),
+            help="full path to the ssl private key",
+        )
+        parser.add_argument(
+            "--ssl-public-key",
+            type=argparse.FileType("r"),
+            help="full path to the ssl public key",
+        )
+        parser.add_argument(
+            "--ssl-ca",
+            type=argparse.FileType("r"),
+            help="full path to the ssl certificate authority (CA)",
+        )
         self.configure_argument_parser(parser)
         return parser
 
@@ -164,6 +180,25 @@ class PrometheusExporterScript(Script):  # type: ignore
                 ProcessCollector(registry=None)
             )
 
+    def _get_ssl_context(
+        self, args: argparse.Namespace
+    ) -> ssl.SSLContext | None:
+        if args.ssl_private_key is None or args.ssl_public_key is None:
+            return None
+        cafile = None
+        if args.ssl_ca:
+            cafile = args.ssl_ca.name
+            args.ssl_ca.close()
+        ssl_context = ssl.create_default_context(
+            purpose=ssl.Purpose.CLIENT_AUTH, cafile=cafile
+        )
+        ssl_context.load_cert_chain(
+            args.ssl_public_key.name, args.ssl_private_key.name
+        )
+        args.ssl_public_key.close()
+        args.ssl_private_key.close()
+        return ssl_context
+
     def _get_exporter(self, args: argparse.Namespace) -> PrometheusExporter:
         """Return a :class:`PrometheusExporter` configured with args."""
         exporter = PrometheusExporter(
@@ -173,6 +208,7 @@ class PrometheusExporterScript(Script):  # type: ignore
             args.port,
             self.registry,
             metrics_path=args.metrics_path,
+            ssl_context=self._get_ssl_context(args),
         )
         exporter.app.on_startup.append(self.on_application_startup)
         exporter.app.on_shutdown.append(self.on_application_shutdown)

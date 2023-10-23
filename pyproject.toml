@@ -48,6 +48,7 @@ testing = [
   "pytest-aiohttp",
   "pytest-asyncio",
   "pytest-mock",
+  "trustme",
 ]
 [project.urls]
 changelog = "https://github.com/albertodonato/prometheus-aioexporter/blob/main/CHANGES.rst"
