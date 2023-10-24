@@ -3,7 +3,6 @@
 from collections.abc import (
     Awaitable,
     Callable,
-    Iterable,
 )
 from ssl import SSLContext
 from textwrap import dedent
@@ -14,15 +13,13 @@ from aiohttp.web import (
     Response,
     run_app,
 )
-from prometheus_client import (
-    CONTENT_TYPE_LATEST,
-    Metric,
-)
+from prometheus_client import CONTENT_TYPE_LATEST
+from prometheus_client.metrics import MetricWrapperBase
 
-from .metric import MetricsRegistry
+from ._metric import MetricsRegistry
 
 # Signature for update handler
-UpdateHandler = Callable[[Iterable[Metric]], Awaitable[None]]
+UpdateHandler = Callable[[dict[str, MetricWrapperBase]], Awaitable[None]]
 
 
 class PrometheusExporter:
@@ -65,7 +62,7 @@ class PrometheusExporter:
         as argument, mapping metric names to metrics.  The signature is the
         following:
 
-          async def update_handler(metrics):
+          async def update_handler(metrics: dict[str, MetricWrapperBase]) -> None:
 
         """
         self._update_handler = handler

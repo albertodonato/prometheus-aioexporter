@@ -3,11 +3,11 @@ from unittest import mock
 
 import pytest
 
-from prometheus_aioexporter.metric import (
+from prometheus_aioexporter._metric import (
     MetricConfig,
     MetricsRegistry,
 )
-from prometheus_aioexporter.web import PrometheusExporter
+from prometheus_aioexporter._web import PrometheusExporter
 from tests.conftest import ssl_context
 
 
@@ -60,7 +60,7 @@ class TestPrometheusExporter:
     @pytest.mark.parametrize("exporter", [ssl_context, None], indirect=True)
     def test_run(self, mocker, exporter):
         """The script starts the web application."""
-        mock_run_app = mocker.patch("prometheus_aioexporter.web.run_app")
+        mock_run_app = mocker.patch("prometheus_aioexporter._web.run_app")
         exporter.run()
         mock_run_app.assert_called_with(
             mock.ANY,
@@ -106,7 +106,7 @@ class TestPrometheusExporter:
     async def test_metrics(self, aiohttp_client, exporter, registry):
         """The /metrics page display Prometheus metrics."""
         metrics = registry.create_metrics(
-            [MetricConfig("test_gauge", "A test gauge", "gauge", {})]
+            [MetricConfig("test_gauge", "A test gauge", "gauge")]
         )
         metrics["test_gauge"].set(12.3)
         client = await aiohttp_client(exporter.app)
@@ -132,7 +132,7 @@ class TestPrometheusExporter:
             ssl_context=ssl_context,
         )
         metrics = registry.create_metrics(
-            [MetricConfig("test_gauge", "A test gauge", "gauge", {})]
+            [MetricConfig("test_gauge", "A test gauge", "gauge")]
         )
         metrics["test_gauge"].set(12.3)
         client = await aiohttp_client(exporter.app)
@@ -159,8 +159,8 @@ class TestPrometheusExporter:
         exporter.set_metric_update_handler(update_handler)
         metrics = registry.create_metrics(
             [
-                MetricConfig("metric1", "A test gauge", "gauge", {}),
-                MetricConfig("metric2", "A test histogram", "histogram", {}),
+                MetricConfig("metric1", "A test gauge", "gauge"),
+                MetricConfig("metric2", "A test histogram", "histogram"),
             ]
         )
         client = await aiohttp_client(exporter.app)

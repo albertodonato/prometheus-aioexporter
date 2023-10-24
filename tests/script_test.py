@@ -5,8 +5,8 @@ from unittest import mock
 
 import pytest
 
-from prometheus_aioexporter.metric import MetricConfig
-from prometheus_aioexporter.script import PrometheusExporterScript
+from prometheus_aioexporter._metric import MetricConfig
+from prometheus_aioexporter._script import PrometheusExporterScript
 
 
 class SampleScript(PrometheusExporterScript):
@@ -62,9 +62,9 @@ class TestPrometheusExporterScript:
     def test_setup_logging(self, mocker, script):
         """Logging is set up."""
         mock_setup_logger = mocker.patch(
-            "prometheus_aioexporter.script.setup_logger"
+            "prometheus_aioexporter._script.setup_logger"
         )
-        mocker.patch("prometheus_aioexporter.web.PrometheusExporter.run")
+        mocker.patch("prometheus_aioexporter._web.PrometheusExporter.run")
         script([])
         logger_names = (
             "aiohttp.access",
@@ -139,7 +139,7 @@ class TestPrometheusExporterScript:
 
     def test_include_process_stats(self, mocker, script):
         """The script can include process stats in metrics."""
-        mocker.patch("prometheus_aioexporter.web.PrometheusExporter.run")
+        mocker.patch("prometheus_aioexporter._web.PrometheusExporter.run")
         script(["--process-stats"])
         # process stats are present in the registry
         assert (
@@ -163,7 +163,7 @@ class TestPrometheusExporterScript:
         tls_public_key_path,
     ):
         """The script runs the exporter application."""
-        mock_run_app = mocker.patch("prometheus_aioexporter.web.run_app")
+        mock_run_app = mocker.patch("prometheus_aioexporter._web.run_app")
         script(
             [
                 "--ssl-public-key",
@@ -179,7 +179,7 @@ class TestPrometheusExporterScript:
 
     def test_script_run_exporter(self, mocker, script):
         """The script runs the exporter application."""
-        mock_run_app = mocker.patch("prometheus_aioexporter.web.run_app")
+        mock_run_app = mocker.patch("prometheus_aioexporter._web.run_app")
         script([])
         mock_run_app.assert_called_with(
             mock.ANY,

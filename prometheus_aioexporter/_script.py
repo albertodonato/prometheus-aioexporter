@@ -8,18 +8,16 @@ import sys
 from typing import IO
 
 from aiohttp.web import Application
-from prometheus_client import (
-    Metric,
-    ProcessCollector,
-)
+from prometheus_client import ProcessCollector
+from prometheus_client.metrics import MetricWrapperBase
 from toolrack.log import setup_logger
 from toolrack.script import Script
 
-from .metric import (
+from ._metric import (
     MetricConfig,
     MetricsRegistry,
 )
-from .web import PrometheusExporter
+from ._web import PrometheusExporter
 
 
 class PrometheusExporterScript(Script):  # type: ignore
@@ -95,7 +93,7 @@ class PrometheusExporterScript(Script):  # type: ignore
 
     def create_metrics(
         self, metric_configs: Iterable[MetricConfig]
-    ) -> dict[str, Metric]:
+    ) -> dict[str, MetricWrapperBase]:
         """Create and register metrics from a list of MetricConfigs."""
         return self.registry.create_metrics(metric_configs)
 
@@ -176,8 +174,10 @@ class PrometheusExporterScript(Script):  # type: ignore
     def _configure_registry(self, include_process_stats: bool = False) -> None:
         """Configure the MetricRegistry."""
         if include_process_stats:
+            # XXX ignore type until
+            # https://github.com/prometheus/client_python/pull/970 is fixed
             self.registry.register_additional_collector(
-                ProcessCollector(registry=None)
+                ProcessCollector(registry=None)  # type: ignore[arg-type]
             )
 
     def _get_ssl_context(
