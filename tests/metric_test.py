@@ -1,8 +1,10 @@
 from typing import (
     Any,
     Callable,
+    cast,
 )
 
+from prometheus_client import Histogram
 from prometheus_client.metrics import MetricWrapperBase
 import pytest
 
@@ -14,8 +16,7 @@ from prometheus_aioexporter._metric import (
 
 
 class TestMetricConfig:
-    def test_invalid_metric_type(self):
-        """An invalid metric type raises an error."""
+    def test_invalid_metric_type(self) -> None:
         with pytest.raises(InvalidMetricType) as error:
             MetricConfig("m1", "desc1", "unknown")
         assert str(error.value) == (
@@ -29,8 +30,7 @@ class TestMetricConfig:
 
 
 class TestMetricsRegistry:
-    def test_create_metrics(self):
-        """Prometheus metrics are created from the specified config."""
+    def test_create_metrics(self) -> None:
         configs = [
             MetricConfig("m1", "desc1", "counter"),
             MetricConfig("m2", "desc2", "histogram"),
@@ -40,27 +40,25 @@ class TestMetricsRegistry:
         assert metrics["m1"]._type == "counter"
         assert metrics["m2"]._type == "histogram"
 
-    def test_create_metrics_with_config(self):
-        """Metric configs are applied."""
+    def test_create_metrics_with_config(self) -> None:
         configs = [
             MetricConfig(
                 "m1", "desc1", "histogram", config={"buckets": [10, 20]}
             )
         ]
         metrics = MetricsRegistry().create_metrics(configs)
-        # The two specified bucket plus +Inf
-        assert len(metrics["m1"]._buckets) == 3
+        # Histogram has the two specified bucket plus +Inf
+        histogram = cast(Histogram, metrics["m1"])
+        assert len(histogram._buckets) == 3
 
-    def test_create_metrics_config_ignores_unknown(self):
-        """Unknown metric configs are ignored and don't cause an error."""
+    def test_create_metrics_config_ignores_unknown(self) -> None:
         configs = [
             MetricConfig("m1", "desc1", "gauge", config={"unknown": "value"})
         ]
         metrics = MetricsRegistry().create_metrics(configs)
         assert len(metrics) == 1
 
-    def test_get_metrics(self):
-        """get_metrics returns a dict with metrics."""
+    def test_get_metrics(self) -> None:
         registry = MetricsRegistry()
         metrics = registry.create_metrics(
             [
@@ -70,8 +68,7 @@ class TestMetricsRegistry:
         )
         assert registry.get_metrics() == metrics
 
-    def test_get_metric(self):
-        """get_metric returns a metric."""
+    def test_get_metric(self) -> None:
         configs = [
             MetricConfig(
                 "m",
@@ -86,8 +83,7 @@ class TestMetricsRegistry:
         assert metric._name == "m"
         assert metric._labelvalues == ()
 
-    def test_get_metric_with_labels(self):
-        """get_metric returns a metric configured with labels."""
+    def test_get_metric_with_labels(self) -> None:
         configs = [
             MetricConfig("m", "A test gauge", "gauge", labels=("l1", "l2"))
         ]
