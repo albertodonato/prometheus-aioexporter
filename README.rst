@@ -90,10 +90,6 @@ which receives the ``argparse.ArgumentParser`` instance used by the script.
 The ``script`` variable from the example above can be referenced in
 ``pyproject.toml`` to generate the script, like
 
-In order to serve metrics on the HTTPs endpoint both ``ssl-private-key`` and
-``ssl-public-key`` need to be define. The ssl certificate authority
-(i.e. ``ssl-ca``) is optional.
-
 .. code:: toml
 
     [project.scripts]
@@ -102,6 +98,10 @@ In order to serve metrics on the HTTPs endpoint both ``ssl-private-key`` and
 
 The ``description`` of the exporter can be customized by setting the docstring
 in the script class.
+
+In order to serve metrics on the HTTPS endpoint both ``ssl-private-key`` and
+``ssl-public-key`` need to be define. The ssl certificate authority
+(i.e. ``ssl-ca``) is optional.
 
 
 Startup configuration
