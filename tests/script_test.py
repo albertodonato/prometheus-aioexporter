@@ -1,9 +1,12 @@
+from argparse import ArgumentParser
 from io import StringIO
 import logging
 from ssl import SSLContext
+from typing import Iterator
 from unittest import mock
 
 import pytest
+from pytest_mock import MockerFixture
 
 from prometheus_aioexporter._metric import MetricConfig
 from prometheus_aioexporter._script import PrometheusExporterScript
@@ -15,41 +18,36 @@ class SampleScript(PrometheusExporterScript):
     name = "sample-script"
     default_port = 12345
 
+    def configure_argument_parser(self, parser: ArgumentParser) -> None:
+        parser.add_argument("--test", help="test argument")
+
 
 @pytest.fixture
-def script():
+def script() -> Iterator[PrometheusExporterScript]:
     yield SampleScript()
 
 
 class TestPrometheusExporterScript:
-    def test_description(self, script):
-        """The description attribute returns the class docstring."""
+    def test_description(self, script: PrometheusExporterScript) -> None:
         assert script.description == "A sample script"
 
-    def test_description_empty(self, script):
-        """The description is empty string if no docstring is set."""
+    def test_description_empty(self, script: PrometheusExporterScript) -> None:
         script.__doc__ = None
         assert script.description == ""
 
-    def test_logger(self, script):
-        """The script logger uses the script name."""
+    def test_logger(self, script: PrometheusExporterScript) -> None:
         assert script.logger.name == "sample-script"
 
-    def test_configure_argument_parser(self, script):
-        """configure_argument_parser adds specified arguments."""
-
-        def configure_argument_parser(parser):
-            parser.add_argument("test", help="test argument")
-
-        script.configure_argument_parser = configure_argument_parser
+    def test_configure_argument_parser(
+        self, script: PrometheusExporterScript
+    ) -> None:
         parser = script.get_parser()
 
         fh = StringIO()
         parser.print_help(file=fh)
         assert "test argument" in fh.getvalue()
 
-    def test_create_metrics(self, script):
-        """Metrics are created based on the configuration."""
+    def test_create_metrics(self, script: PrometheusExporterScript) -> None:
         configs = [
             MetricConfig("m1", "desc1", "counter", {}),
             MetricConfig("m2", "desc2", "histogram", {}),
@@ -59,8 +57,9 @@ class TestPrometheusExporterScript:
         assert metrics["m1"]._type == "counter"
         assert metrics["m2"]._type == "histogram"
 
-    def test_setup_logging(self, mocker, script):
-        """Logging is set up."""
+    def test_setup_logging(
+        self, mocker: MockerFixture, script: PrometheusExporterScript
+    ) -> None:
         mock_setup_logger = mocker.patch(
             "prometheus_aioexporter._script.setup_logger"
         )
@@ -79,24 +78,27 @@ class TestPrometheusExporterScript:
         ]
         mock_setup_logger.assert_has_calls(calls)
 
-    def test_change_metrics_path(self, script):
-        """The path under which metrics are exposed can be changed."""
+    def test_change_metrics_path(
+        self, script: PrometheusExporterScript
+    ) -> None:
         args = script.get_parser().parse_args(
             ["--metrics-path", "/other-path"]
         )
         exporter = script._get_exporter(args)
         assert exporter.metrics_path == "/other-path"
 
-    def test_only_ssl_key(self, script, tls_private_key_path):
-        """The path under which metrics are exposed can be changed."""
+    def test_only_ssl_key(
+        self, script: PrometheusExporterScript, tls_private_key_path: str
+    ) -> None:
         args = script.get_parser().parse_args(
             ["--ssl-private-key", tls_private_key_path]
         )
         exporter = script._get_exporter(args)
         assert exporter.ssl_context is None
 
-    def test_only_ssl_cert(self, script, tls_public_key_path):
-        """The path under which metrics are exposed can be changed."""
+    def test_only_ssl_cert(
+        self, script: PrometheusExporterScript, tls_public_key_path: str
+    ) -> None:
         args = script.get_parser().parse_args(
             ["--ssl-public-key", tls_public_key_path]
         )
@@ -104,9 +106,11 @@ class TestPrometheusExporterScript:
         assert exporter.ssl_context is None
 
     def test_ssl_components_without_ca(
-        self, script, tls_private_key_path, tls_public_key_path
-    ):
-        """The path under which metrics are exposed can be changed."""
+        self,
+        script: PrometheusExporterScript,
+        tls_private_key_path: str,
+        tls_public_key_path: str,
+    ) -> None:
         args = script.get_parser().parse_args(
             [
                 "--ssl-public-key",
@@ -120,9 +124,12 @@ class TestPrometheusExporterScript:
         assert len(exporter.ssl_context.get_ca_certs()) != 1
 
     def test_ssl_components(
-        self, script, tls_private_key_path, tls_ca_path, tls_public_key_path
-    ):
-        """The path under which metrics are exposed can be changed."""
+        self,
+        script: PrometheusExporterScript,
+        tls_private_key_path: str,
+        tls_ca_path: str,
+        tls_public_key_path: str,
+    ) -> None:
         args = script.get_parser().parse_args(
             [
                 "--ssl-public-key",
@@ -137,8 +144,9 @@ class TestPrometheusExporterScript:
         assert isinstance(exporter.ssl_context, SSLContext)
         assert len(exporter.ssl_context.get_ca_certs()) == 1
 
-    def test_include_process_stats(self, mocker, script):
-        """The script can include process stats in metrics."""
+    def test_include_process_stats(
+        self, mocker: MockerFixture, script: PrometheusExporterScript
+    ) -> None:
         mocker.patch("prometheus_aioexporter._web.PrometheusExporter.run")
         script(["--process-stats"])
         # process stats are present in the registry
@@ -147,8 +155,9 @@ class TestPrometheusExporterScript:
             in script.registry.registry._names_to_collectors
         )
 
-    def test_get_exporter_registers_handlers(self, script):
-        """Startup/shutdown handlers are registered with the application."""
+    def test_get_exporter_registers_handlers(
+        self, script: PrometheusExporterScript
+    ) -> None:
         args = script.get_parser().parse_args([])
         exporter = script._get_exporter(args)
         assert script.on_application_startup in exporter.app.on_startup
@@ -156,13 +165,12 @@ class TestPrometheusExporterScript:
 
     def test_script_run_exporter_ssl(
         self,
-        mocker,
-        script,
-        ssl_context,
-        tls_private_key_path,
-        tls_public_key_path,
-    ):
-        """The script runs the exporter application."""
+        mocker: MockerFixture,
+        script: PrometheusExporterScript,
+        ssl_context: SSLContext,
+        tls_private_key_path: str,
+        tls_public_key_path: str,
+    ) -> None:
         mock_run_app = mocker.patch("prometheus_aioexporter._web.run_app")
         script(
             [
@@ -177,8 +185,9 @@ class TestPrometheusExporterScript:
             mock_run_app.call_args.kwargs["ssl_context"], SSLContext
         )
 
-    def test_script_run_exporter(self, mocker, script):
-        """The script runs the exporter application."""
+    def test_script_run_exporter(
+        self, mocker: MockerFixture, script: PrometheusExporterScript
+    ) -> None:
         mock_run_app = mocker.patch("prometheus_aioexporter._web.run_app")
         script([])
         mock_run_app.assert_called_with(
