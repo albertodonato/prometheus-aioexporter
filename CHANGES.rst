@@ -1,8 +1,17 @@
-1.7.0 - 2021-03-02
+2.0.0 - 2023-10-28
+==================
+
+- Add HTTPS (SSL) support.
+- Rework ``MetricConfig``, labels are now an attribute.
+- Rework project setup, make packages private.
+- Add typing to tests.
+
+
+1.7.0 - 2023-03-02
 ==================
 
 - Require Python 3.10 or later.
-- Reqork project setup, move tests.
+- Rework project setup, move tests.
 - Drop ``setup.{py,cfg}``, extract ``tox.ini`` config.
 
 
