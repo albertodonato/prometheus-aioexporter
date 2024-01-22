@@ -1,7 +1,7 @@
 Asyncio library for creating Prometheus exporters
 =================================================
 
-|Latest Version| |Build Status| |Coverage Status|
+|Latest Version| |Build Status|
 
 ``prometheus-aioexporter`` is an aysncio-based library to simplify writing
 Prometheus_ exporters.
@@ -169,6 +169,3 @@ run as ``prometheus-aioexporter-sample``).
 .. |Build Status| image:: https://github.com/albertodonato/prometheus-aioexporter/workflows/CI/badge.svg
    :alt: Build Status
    :target: https://github.com/albertodonato/prometheus-aioexporter/actions?query=workflow%3ACI
-.. |Coverage Status| image:: https://img.shields.io/codecov/c/github/albertodonato/prometheus-aioexporter/master.svg
-   :alt: Coverage Status
-   :target: https://codecov.io/gh/albertodonato/prometheus-aioexporter
