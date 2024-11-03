@@ -1,5 +1,5 @@
+from collections.abc import Iterator
 import ssl
-from typing import Iterator
 
 import pytest
 from trustme import (

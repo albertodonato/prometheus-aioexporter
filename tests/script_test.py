@@ -1,8 +1,8 @@
 from argparse import ArgumentParser
+from collections.abc import Iterator
 from io import StringIO
 import logging
 from ssl import SSLContext
-from typing import Iterator
 from unittest import mock
 
 import pytest

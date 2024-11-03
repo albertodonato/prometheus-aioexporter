@@ -12,10 +12,10 @@ from prometheus_client import (
     Counter,
     Enum,
     Gauge,
-    generate_latest,
     Histogram,
     Info,
     Summary,
+    generate_latest,
 )
 from prometheus_client.metrics import MetricWrapperBase
 from prometheus_client.registry import Collector

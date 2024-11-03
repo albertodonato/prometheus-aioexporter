@@ -1,11 +1,13 @@
+from collections.abc import (
+    Awaitable,
+    Callable,
+    Coroutine,
+    Iterator,
+)
 from ssl import SSLContext
 from typing import (
     Any,
-    Awaitable,
-    Callable,
     cast,
-    Coroutine,
-    Iterator,
 )
 from unittest import mock
 
@@ -84,10 +86,10 @@ class TestPrometheusExporter:
             ssl_context=exporter.ssl_context,
         )
 
-    @pytest.mark.parametrize("exporter", [ssl_context, None], indirect=True)
+    @pytest.mark.parametrize("exporter", [ssl_context, False], indirect=True)
     async def test_homepage(
         self,
-        ssl_context_server: SSLContext,
+        ssl_context_server: SSLContext | bool,
         create_server_client: Callable[
             [PrometheusExporter], Coroutine[Any, Any, TestServer]
         ],
@@ -96,7 +98,7 @@ class TestPrometheusExporter:
     ) -> None:
         server = await create_server_client(exporter)
         client = await aiohttp_client(server)
-        ssl_client_context = None
+        ssl_client_context: SSLContext | bool = False
         if exporter.ssl_context is not None:
             ssl_client_context = ssl_context_server
         request = await client.request("GET", "/", ssl=ssl_client_context)
@@ -177,7 +179,7 @@ class TestPrometheusExporter:
         args = []
 
         async def update_handler(
-            metrics: dict[str, MetricWrapperBase]
+            metrics: dict[str, MetricWrapperBase],
         ) -> None:
             args.append(metrics)
 

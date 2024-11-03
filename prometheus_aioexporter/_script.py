@@ -20,7 +20,7 @@ from ._metric import (
 from ._web import PrometheusExporter
 
 
-class PrometheusExporterScript(Script):  # type: ignore
+class PrometheusExporterScript(Script):
     """Expose metrics to Prometheus."""
 
     #: Name of the script, can be set by subsclasses.
@@ -169,7 +169,7 @@ class PrometheusExporterScript(Script):  # type: ignore
             self.name,
         )
         for name in names:
-            setup_logger(name=name, stream=sys.stderr, level=level)
+            setup_logger(name=name, stream=sys.stderr, level=level)  # type: ignore
 
     def _configure_registry(self, include_process_stats: bool = False) -> None:
         """Configure the MetricRegistry."""
