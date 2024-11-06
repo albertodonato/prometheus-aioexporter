@@ -4,8 +4,10 @@ from collections.abc import (
     Awaitable,
     Callable,
 )
+import logging
 from ssl import SSLContext
 from textwrap import dedent
+from typing import cast
 
 from aiohttp.web import (
     Application,
@@ -15,7 +17,9 @@ from aiohttp.web import (
 )
 from prometheus_client import CONTENT_TYPE_LATEST
 from prometheus_client.metrics import MetricWrapperBase
+import structlog
 
+from ._log import AccessLogger
 from ._metric import MetricsRegistry
 
 # Signature for update handler
@@ -45,6 +49,7 @@ class PrometheusExporter:
         registry: MetricsRegistry,
         metrics_path: str = "/metrics",
         ssl_context: SSLContext | None = None,
+        logger: structlog.BoundLogger | None = None,
     ) -> None:
         self.name = name
         self.description = description
@@ -52,6 +57,9 @@ class PrometheusExporter:
         self.port = port
         self.registry = registry
         self.metrics_path = metrics_path
+        self.logger = logger or cast(
+            structlog.BoundLogger, structlog.get_logger()
+        )
         self.app = self._make_application()
         self.ssl_context = ssl_context
 
@@ -74,13 +82,13 @@ class PrometheusExporter:
             host=self.hosts,
             port=self.port,
             print=lambda *args, **kargs: None,
-            access_log_format='%a "%r" %s %b "%{Referrer}i" "%{User-Agent}i"',
+            access_log_class=AccessLogger,
             ssl_context=self.ssl_context,
         )
 
     def _make_application(self) -> Application:
         """Setup an :class:`aiohttp.web.Application`."""
-        app = Application()
+        app = Application(logger=cast(logging.Logger, self.logger))
         app["exporter"] = self
         app.router.add_get("/", self._handle_home)
         app.router.add_get(self.metrics_path, self._handle_metrics)
@@ -95,8 +103,8 @@ class PrometheusExporter:
             protocol = "http"
             if self.ssl_context:
                 protocol = "https"
-            self.app.logger.info(
-                f"Listening on {protocol}://{host}:{self.port}"
+            self.logger.info(
+                "listening", url=f"{protocol}://{host}:{self.port}"
             )
 
     async def _handle_home(self, request: Request) -> Response:

@@ -20,13 +20,16 @@ from prometheus_client import Gauge
 from prometheus_client.metrics import MetricWrapperBase
 import pytest
 from pytest_mock import MockerFixture
+from pytest_structlog import StructuredLogCapture
 
+from prometheus_aioexporter._log import AccessLogger
 from prometheus_aioexporter._metric import (
     MetricConfig,
     MetricsRegistry,
 )
 from prometheus_aioexporter._web import PrometheusExporter
-from tests.conftest import ssl_context
+
+from .conftest import ssl_context
 
 AiohttpClient = Callable[
     [Application | TestServer], Awaitable[TestClient[Request, Application]]
@@ -67,6 +70,7 @@ def create_server_client(
     yield create
 
 
+@pytest.mark.usefixtures("log")
 class TestPrometheusExporter:
     def test_app_exporter_reference(
         self, exporter: PrometheusExporter
@@ -84,7 +88,7 @@ class TestPrometheusExporter:
             host=["localhost"],
             port=8000,
             print=mock.ANY,
-            access_log_format='%a "%r" %s %b "%{Referrer}i" "%{User-Agent}i"',
+            access_log_class=AccessLogger,
             ssl_context=exporter.ssl_context,
         )
 
@@ -201,7 +205,7 @@ class TestPrometheusExporter:
     )
     async def test_startup_logger(
         self,
-        mocker: MockerFixture,
+        log: StructuredLogCapture,
         registry: MetricsRegistry,
         ssl_context: SSLContext,
         protocol: str,
@@ -214,9 +218,10 @@ class TestPrometheusExporter:
             registry,
             ssl_context=ssl_context,
         )
-        mock_log = mocker.patch.object(exporter.app.logger, "info")
         await exporter._log_startup_message(exporter.app)
-        assert mock_log.mock_calls == [
-            mock.call(f"Listening on {protocol}://0.0.0.0:8000"),
-            mock.call(f"Listening on {protocol}://[::1]:8000"),
-        ]
+        assert log.has(
+            "listening", url=f"{protocol}://0.0.0.0:8000", level="info"
+        )
+        assert log.has(
+            "listening", url=f"{protocol}://[::1]:8000", level="info"
+        )

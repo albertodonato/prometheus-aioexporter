@@ -1,13 +1,13 @@
 from argparse import ArgumentParser
 from collections.abc import Iterator
 from io import StringIO
-import logging
 from ssl import SSLContext
 from unittest import mock
 
 import pytest
 from pytest_mock import MockerFixture
 
+from prometheus_aioexporter._log import AccessLogger
 from prometheus_aioexporter._metric import MetricConfig
 from prometheus_aioexporter._script import PrometheusExporterScript
 
@@ -27,6 +27,7 @@ def script() -> Iterator[PrometheusExporterScript]:
     yield SampleScript()
 
 
+@pytest.mark.usefixtures("log")
 class TestPrometheusExporterScript:
     def test_description(self, script: PrometheusExporterScript) -> None:
         assert script.description == "A sample script"
@@ -34,9 +35,6 @@ class TestPrometheusExporterScript:
     def test_description_empty(self, script: PrometheusExporterScript) -> None:
         script.__doc__ = None
         assert script.description == ""
-
-    def test_logger(self, script: PrometheusExporterScript) -> None:
-        assert script.logger.name == "sample-script"
 
     def test_configure_argument_parser(
         self, script: PrometheusExporterScript
@@ -56,27 +54,6 @@ class TestPrometheusExporterScript:
         assert len(metrics) == 2
         assert metrics["m1"]._type == "counter"
         assert metrics["m2"]._type == "histogram"
-
-    def test_setup_logging(
-        self, mocker: MockerFixture, script: PrometheusExporterScript
-    ) -> None:
-        mock_setup_logger = mocker.patch(
-            "prometheus_aioexporter._script.setup_logger"
-        )
-        mocker.patch("prometheus_aioexporter._web.PrometheusExporter.run")
-        script([])
-        logger_names = (
-            "aiohttp.access",
-            "aiohttp.internal",
-            "aiohttp.server",
-            "aiohttp.web",
-            "sample-script",
-        )
-        calls = [
-            mock.call(level=logging.WARNING, name=name, stream=mock.ANY)
-            for name in logger_names
-        ]
-        mock_setup_logger.assert_has_calls(calls)
 
     def test_change_metrics_path(
         self, script: PrometheusExporterScript
@@ -195,6 +172,6 @@ class TestPrometheusExporterScript:
             host=["localhost"],
             port=12345,
             print=mock.ANY,
-            access_log_format='%a "%r" %s %b "%{Referrer}i" "%{User-Agent}i"',
+            access_log_class=AccessLogger,
             ssl_context=None,
         )

@@ -69,19 +69,23 @@ Exporter command-line
 
 .. code::
 
-    optional arguments:
+    options:
       -h, --help            show this help message and exit
       -H HOST [HOST ...], --host HOST [HOST ...]
                             host addresses to bind (default: ['localhost'])
       -p PORT, --port PORT  port to run the webserver on (default: 9090)
       --metrics-path METRICS_PATH
                             path under which metrics are exposed (default: /metrics)
-      -L {CRITICAL,ERROR,WARNING,INFO,DEBUG}, --log-level {CRITICAL,ERROR,WARNING,INFO,DEBUG}
-                            minimum level for log messages (default: WARNING)
+      -L {critical,error,warning,info,debug}, --log-level {critical,error,warning,info,debug}
+                            minimum level for log messages (default: info)
+      --log-format {plain,json}
+                            log output format (default: plain)
       --process-stats       include process stats in metrics (default: False)
-      --ssl-private-key     full path to the ssl private key
-      --ssl-public-key      full path to the ssl public key
-      --ssl-ca              full path to the ssl certificate authority (CA)
+      --ssl-private-key SSL_PRIVATE_KEY
+                            full path to the ssl private key (default: None)
+      --ssl-public-key SSL_PUBLIC_KEY
+                            full path to the ssl public key (default: None)
+      --ssl-ca SSL_CA       full path to the ssl certificate authority (CA) (default: None)
 
 
 Further options can be added by implementing ``configure_argument_parser()``,

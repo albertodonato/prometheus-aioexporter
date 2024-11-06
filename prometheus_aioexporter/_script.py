@@ -2,17 +2,16 @@
 
 import argparse
 from collections.abc import Iterable
-import logging
 import ssl
-import sys
-from typing import IO
+from typing import IO, cast
 
 from aiohttp.web import Application
 from prometheus_client import ProcessCollector
 from prometheus_client.metrics import MetricWrapperBase
-from toolrack.log import setup_logger
+import structlog
 from toolrack.script import Script
 
+from ._log import LogFormat, LogLevel, setup_logging
 from ._metric import (
     MetricConfig,
     MetricsRegistry,
@@ -26,19 +25,28 @@ class PrometheusExporterScript(Script):
     #: Name of the script, can be set by subsclasses.
     name = "prometheus-exporter"
 
-    # The defualt port for the exporter, can be changed by subclasses.
+    #: Default port for the exporter, can be changed by subclasses.
     default_port = 9090
 
-    # The default path under which metrics are exposed.
+    #: Default path under which metrics are exposed.
     default_metrics_path = "/metrics"
 
+    #: Registry for handling metrics.
     registry: MetricsRegistry
+    #: Structured logger for the exporter.
+    logger: structlog.BoundLogger
 
     def __init__(
-        self, stdout: IO[bytes] | None = None, stderr: IO[bytes] | None = None
+        self,
+        stdout: IO[bytes] | None = None,
+        stderr: IO[bytes] | None = None,
+        logger: structlog.BoundLogger | None = None,
     ) -> None:
         super().__init__(stdout=stdout, stderr=stderr)
         self.registry = MetricsRegistry()
+        if not logger:
+            logger = cast(structlog.BoundLogger, structlog.get_logger())
+        self.logger = logger
 
     @property
     def description(self) -> str:
@@ -48,11 +56,6 @@ class PrometheusExporterScript(Script):
 
         """
         return self.__doc__ or ""
-
-    @property
-    def logger(self) -> logging.Logger:
-        """A logger for the script."""
-        return logging.getLogger(name=self.name)
 
     def configure_argument_parser(
         self, parser: argparse.ArgumentParser
@@ -124,9 +127,16 @@ class PrometheusExporterScript(Script):
         parser.add_argument(
             "-L",
             "--log-level",
-            default="WARNING",
-            choices=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"],
+            type=LogLevel,
+            default=LogLevel.INFO,
+            choices=[str(choice) for choice in LogLevel],
             help="minimum level for log messages",
+        )
+        parser.add_argument(
+            "--log-format",
+            default=LogFormat.PLAIN,
+            choices=[str(choice) for choice in LogFormat],
+            help="log output format",
         )
         parser.add_argument(
             "--process-stats",
@@ -152,24 +162,12 @@ class PrometheusExporterScript(Script):
         return parser
 
     def main(self, args: argparse.Namespace) -> None:
-        self._setup_logging(args.log_level)
+        setup_logging(args.log_format, args.log_level)
+        self.logger.info("startup")
         self._configure_registry(include_process_stats=args.process_stats)
         self.configure(args)
         exporter = self._get_exporter(args)
         exporter.run()
-
-    def _setup_logging(self, log_level: str) -> None:
-        """Setup logging for the application and aiohttp."""
-        level = getattr(logging, log_level)
-        names = (
-            "aiohttp.access",
-            "aiohttp.internal",
-            "aiohttp.server",
-            "aiohttp.web",
-            self.name,
-        )
-        for name in names:
-            setup_logger(name=name, stream=sys.stderr, level=level)  # type: ignore
 
     def _configure_registry(self, include_process_stats: bool = False) -> None:
         """Configure the MetricRegistry."""
@@ -207,6 +205,7 @@ class PrometheusExporterScript(Script):
             self.registry,
             metrics_path=args.metrics_path,
             ssl_context=self._get_ssl_context(args),
+            logger=self.logger,
         )
         exporter.app.on_startup.append(self.on_application_startup)
         exporter.app.on_shutdown.append(self.on_application_shutdown)

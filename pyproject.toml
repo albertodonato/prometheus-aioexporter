@@ -40,6 +40,8 @@ dynamic = [
 dependencies = [
   "aiohttp>=3",
   "prometheus-client>=0.4",
+  "rich",                   # for nice tracebacks
+  "structlog",
   "toolrack>=2.1",
 ]
 optional-dependencies.testing = [
@@ -47,6 +49,7 @@ optional-dependencies.testing = [
   "pytest-aiohttp",
   "pytest-asyncio",
   "pytest-mock",
+  "pytest-structlog",
   "trustme",
 ]
 urls.changelog = "https://github.com/albertodonato/prometheus-aioexporter/blob/main/CHANGES.rst"
@@ -73,6 +76,7 @@ lint.isort.force-sort-within-sections = true
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
+structlog_keep = [ "TimeStamper", "add_log_level", "JSONRenderer" ]
 
 [tool.coverage.report]
 fail_under = 100.0
