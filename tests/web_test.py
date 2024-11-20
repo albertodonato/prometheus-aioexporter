@@ -15,7 +15,7 @@ from aiohttp.test_utils import (
     TestClient,
     TestServer,
 )
-from aiohttp.web import Application
+from aiohttp.web import Application, Request
 from prometheus_client import Gauge
 from prometheus_client.metrics import MetricWrapperBase
 import pytest
@@ -28,7 +28,9 @@ from prometheus_aioexporter._metric import (
 from prometheus_aioexporter._web import PrometheusExporter
 from tests.conftest import ssl_context
 
-AiohttpClient = Callable[[Application | TestServer], Awaitable[TestClient]]
+AiohttpClient = Callable[
+    [Application | TestServer], Awaitable[TestClient[Request, Application]]
+]
 AiohttpServer = Callable[..., Awaitable[TestServer]]
 
 
