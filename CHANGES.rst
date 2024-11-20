@@ -1,3 +1,10 @@
+2.1.0 - 2024-11-20
+==================
+
+- Require Python 3.11 or later.
+- Switch to ``ruff`` for formatting.
+
+
 2.0.0 - 2023-10-28
 ==================
 
