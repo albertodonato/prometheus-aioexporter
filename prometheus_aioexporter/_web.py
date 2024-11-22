@@ -7,7 +7,7 @@ from collections.abc import (
 import logging
 from ssl import SSLContext
 from textwrap import dedent
-from typing import cast
+import typing as t
 
 from aiohttp.web import (
     Application,
@@ -49,7 +49,7 @@ class PrometheusExporter:
         registry: MetricsRegistry,
         metrics_path: str = "/metrics",
         ssl_context: SSLContext | None = None,
-        logger: structlog.BoundLogger | None = None,
+        logger: structlog.stdlib.BoundLogger | None = None,
     ) -> None:
         self.name = name
         self.description = description
@@ -57,9 +57,7 @@ class PrometheusExporter:
         self.port = port
         self.registry = registry
         self.metrics_path = metrics_path
-        self.logger = logger or cast(
-            structlog.BoundLogger, structlog.get_logger()
-        )
+        self.logger = logger or structlog.get_logger()
         self.app = self._make_application()
         self.ssl_context = ssl_context
 
@@ -88,7 +86,7 @@ class PrometheusExporter:
 
     def _make_application(self) -> Application:
         """Setup an :class:`aiohttp.web.Application`."""
-        app = Application(logger=cast(logging.Logger, self.logger))
+        app = Application(logger=t.cast(logging.Logger, self.logger))
         app["exporter"] = self
         app.router.add_get("/", self._handle_home)
         app.router.add_get(self.metrics_path, self._handle_metrics)
@@ -100,9 +98,7 @@ class PrometheusExporter:
         for host in self.hosts:
             if ":" in host:
                 host = f"[{host}]"
-            protocol = "http"
-            if self.ssl_context:
-                protocol = "https"
+            protocol = "https" if self.ssl_context else "http"
             self.logger.info(
                 "listening", url=f"{protocol}://{host}:{self.port}"
             )

@@ -1,7 +1,7 @@
 from enum import StrEnum
 from functools import cached_property
 import logging
-from typing import cast
+import typing as t
 
 from aiohttp.abc import AbstractAccessLogger
 from aiohttp.web import BaseRequest, StreamResponse
@@ -29,7 +29,7 @@ class LogLevel(StrEnum):
 
     def num_level(self) -> int:
         """Return the numeric level."""
-        return cast(int, getattr(logging, self.name))
+        return t.cast(int, getattr(logging, self.name))
 
     def __repr__(self) -> str:
         return self.value
@@ -39,8 +39,8 @@ class AccessLogger(AbstractAccessLogger):
     """Access logger for aiohttp."""
 
     @cached_property
-    def _logger(self) -> structlog.BoundLogger:
-        return cast(structlog.BoundLogger, structlog.get_logger())
+    def _logger(self) -> structlog.stdlib.BoundLogger:
+        return t.cast(structlog.stdlib.BoundLogger, structlog.get_logger())
 
     def log(
         self, request: BaseRequest, response: StreamResponse, time: float

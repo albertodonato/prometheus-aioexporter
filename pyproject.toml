@@ -39,10 +39,11 @@ dynamic = [
 ]
 dependencies = [
   "aiohttp>=3",
+  "click",
   "prometheus-client>=0.4",
+  "python-dotenv",
   "rich",                   # for nice tracebacks
   "structlog",
-  "toolrack>=2.1",
 ]
 optional-dependencies.testing = [
   "pytest",

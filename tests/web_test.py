@@ -5,10 +5,7 @@ from collections.abc import (
     Iterator,
 )
 from ssl import SSLContext
-from typing import (
-    Any,
-    cast,
-)
+import typing as t
 from unittest import mock
 
 from aiohttp.test_utils import (
@@ -60,9 +57,11 @@ def exporter(
 def create_server_client(
     ssl_context: SSLContext,
     aiohttp_server: AiohttpServer,
-) -> Iterator[Callable[[PrometheusExporter], Coroutine[Any, Any, TestServer]]]:
+) -> Iterator[
+    Callable[[PrometheusExporter], Coroutine[t.Any, t.Any, TestServer]]
+]:
     async def create(exporter: PrometheusExporter) -> TestServer:
-        kwargs: dict[str, Any] = {}
+        kwargs: dict[str, t.Any] = {}
         if exporter.ssl_context is None:
             kwargs["ssl"] = exporter.ssl_context
         return await aiohttp_server(exporter.app, **kwargs)
@@ -97,7 +96,7 @@ class TestPrometheusExporter:
         self,
         ssl_context_server: SSLContext | bool,
         create_server_client: Callable[
-            [PrometheusExporter], Coroutine[Any, Any, TestServer]
+            [PrometheusExporter], Coroutine[t.Any, t.Any, TestServer]
         ],
         exporter: PrometheusExporter,
         aiohttp_client: AiohttpClient,
@@ -135,7 +134,7 @@ class TestPrometheusExporter:
         metrics = registry.create_metrics(
             [MetricConfig("test_gauge", "A test gauge", "gauge")]
         )
-        gauge = cast(Gauge, metrics["test_gauge"])
+        gauge = t.cast(Gauge, metrics["test_gauge"])
         gauge.set(12.3)
         client = await aiohttp_client(exporter.app)
         request = await client.request("GET", "/metrics")
@@ -163,7 +162,7 @@ class TestPrometheusExporter:
         metrics = registry.create_metrics(
             [MetricConfig("test_gauge", "A test gauge", "gauge")]
         )
-        gaute = cast(Gauge, metrics["test_gauge"])
+        gaute = t.cast(Gauge, metrics["test_gauge"])
         gaute.set(12.3)
         client = await aiohttp_client(exporter.app)
         request = await client.request("GET", "/other-path")

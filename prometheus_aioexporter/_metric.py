@@ -5,7 +5,7 @@ from dataclasses import (
     dataclass,
     field,
 )
-from typing import Any
+import typing as t
 
 from prometheus_client import (
     CollectorRegistry,
@@ -48,7 +48,7 @@ class MetricConfig:
     description: str
     type: str
     labels: Iterable[str] = field(default_factory=tuple)
-    config: dict[str, Any] = field(default_factory=dict)
+    config: dict[str, t.Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self.labels = tuple(sorted(self.labels))

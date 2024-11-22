@@ -5,9 +5,10 @@ from ._metric import (
     MetricConfig,
     MetricsRegistry,
 )
-from ._script import PrometheusExporterScript
+from ._script import Arguments, PrometheusExporterScript
 
 __all__ = [
+    "Arguments",
     "InvalidMetricType",
     "MetricConfig",
     "MetricsRegistry",

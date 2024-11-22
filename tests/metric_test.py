@@ -1,8 +1,5 @@
 from collections.abc import Callable
-from typing import (
-    Any,
-    cast,
-)
+import typing as t
 
 from prometheus_client import Histogram
 from prometheus_client.metrics import MetricWrapperBase
@@ -48,7 +45,7 @@ class TestMetricsRegistry:
         ]
         metrics = MetricsRegistry().create_metrics(configs)
         # Histogram has the two specified bucket plus +Inf
-        histogram = cast(Histogram, metrics["m1"])
+        histogram = t.cast(Histogram, metrics["m1"])
         assert len(histogram._buckets) == 3
 
     def test_create_metrics_config_ignores_unknown(self) -> None:
@@ -131,7 +128,7 @@ class TestMetricsRegistry:
     def test_generate_metrics(
         self,
         metric_type: str,
-        config: dict[str, Any],
+        config: dict[str, t.Any],
         action: Callable[[MetricWrapperBase], None],
         text: str,
     ) -> None:

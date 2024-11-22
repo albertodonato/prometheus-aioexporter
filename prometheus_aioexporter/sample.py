@@ -1,6 +1,5 @@
-from argparse import Namespace
 import random
-from typing import cast
+import typing as t
 
 from aiohttp.web import Application
 from prometheus_client import (
@@ -10,6 +9,7 @@ from prometheus_client import (
 from prometheus_client.metrics import MetricWrapperBase
 
 from . import (
+    Arguments,
     MetricConfig,
     PrometheusExporterScript,
 )
@@ -21,7 +21,7 @@ class SampleScript(PrometheusExporterScript):
     name = "prometheus-aioexporter-sample"
     default_port = 9091
 
-    def configure(self, args: Namespace) -> None:
+    def configure(self, args: Arguments) -> None:
         self.create_metrics(
             [
                 MetricConfig(
@@ -39,12 +39,12 @@ class SampleScript(PrometheusExporterScript):
     async def _update_handler(
         self, metrics: dict[str, MetricWrapperBase]
     ) -> None:
-        gauge = cast(Gauge, metrics["a_gauge"])
+        gauge = t.cast(Gauge, metrics["a_gauge"])
         gauge.labels(
             foo=random.choice(["this-foo", "other-foo"]),
             bar=random.choice(["this-bar", "other-bar"]),
         ).set(random.uniform(0, 100))
-        counter = cast(Counter, metrics["a_counter"])
+        counter = t.cast(Counter, metrics["a_counter"])
         counter.labels(
             baz=random.choice(["this-baz", "other-baz"]),
         ).inc(random.choice(range(10)))

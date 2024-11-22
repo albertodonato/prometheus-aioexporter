@@ -24,22 +24,25 @@ An example usage is the following:
 
 .. code:: python
 
-    from prometheus_aioexporter import PrometheusExporterScript
+    import click
+    from prometheus_aioexporter import Arguments, PrometheusExporterScript
 
 
     class MyExporter(PrometheusExporterScript):
         """My Prometheus exporter."""
 
         name = "my-exporter"
+        default_port = 9091
+        envvar_prefix = "MYEXP"
 
-        def configure_argument_parser(
-            self, parser: argparse.ArgumentParser
-        ) -> None:
-            # Additional arguments to the script
-            parser.add_argument("--custom-option", help="a custom option")
-            # ...
+        def command_line_parameters(self) -> list[click.Parameter]:
+            # Additional options for the script
+            return [
+                click.Option(["--custom-option"], help="a custom option"),
+                ...
+            ]
 
-        def configure(self, args: argparse.Namespace) -> None:
+        def configure(self, args: Arguments) -> None:
             # Save attributes that are needed for later
             self.data = do_stuff()
             # ...
@@ -62,34 +65,7 @@ An example usage is the following:
     script = MyExporter()
 
 
-Exporter command-line
-~~~~~~~~~~~~~~~~~~~~~
-
-``PrometheusExporterScript`` provides a few command-line arguments by default:
-
-.. code::
-
-    options:
-      -h, --help            show this help message and exit
-      -H HOST [HOST ...], --host HOST [HOST ...]
-                            host addresses to bind (default: ['localhost'])
-      -p PORT, --port PORT  port to run the webserver on (default: 9090)
-      --metrics-path METRICS_PATH
-                            path under which metrics are exposed (default: /metrics)
-      -L {critical,error,warning,info,debug}, --log-level {critical,error,warning,info,debug}
-                            minimum level for log messages (default: info)
-      --log-format {plain,json}
-                            log output format (default: plain)
-      --process-stats       include process stats in metrics (default: False)
-      --ssl-private-key SSL_PRIVATE_KEY
-                            full path to the ssl private key (default: None)
-      --ssl-public-key SSL_PUBLIC_KEY
-                            full path to the ssl public key (default: None)
-      --ssl-ca SSL_CA       full path to the ssl certificate authority (CA) (default: None)
-
-
-Further options can be added by implementing ``configure_argument_parser()``,
-which receives the ``argparse.ArgumentParser`` instance used by the script.
+Also see the `sample script`_ for a complete example.
 
 The ``script`` variable from the example above can be referenced in
 ``pyproject.toml`` to generate the script, like
@@ -103,9 +79,65 @@ The ``script`` variable from the example above can be referenced in
 The ``description`` of the exporter can be customized by setting the docstring
 in the script class.
 
+
+Exporter command-line
+~~~~~~~~~~~~~~~~~~~~~
+
+``PrometheusExporterScript`` provides a few command-line arguments by default:
+
+.. code::
+    Options:
+      -H, --host TEXT                 host addresses to bind  [env var: EXP_HOST;
+                                      default: localhost]
+      -p, --port INTEGER              port to run the webserver on  [env var:
+                                      EXP_PORT; default: 9091]
+      --metrics-path TEXT             path under which metrics are exposed  [env
+                                      var: EXP_METRICS_PATH; default: /metrics]
+      -L, --log-level [critical|error|warning|info|debug]
+                                      minimum level for log messages  [env var:
+                                      EXP_LOG_LEVEL; default: info]
+      --log-format [plain|json]       log output format  [env var: EXP_LOG_FORMAT;
+                                      default: plain]
+      --process-stats                 include process stats in metrics  [env var:
+                                      EXP_PROCESS_STATS]
+      --ssl-private-key FILE          full path to the ssl private key  [env var:
+                                      EXP_SSL_PRIVATE_KEY]
+      --ssl-public-key FILE           full path to the ssl public key  [env var:
+                                      EXP_SSL_PUBLIC_KEY]
+      --ssl-ca FILE                   full path to the ssl certificate authority
+                                      (CA)  [env var: EXP_SSL_CA]
+      --version                       Show the version and exit.
+      --help                          Show this message and exit.
+
+
+Further options can be added by implementing ``command_line_parameters()`` to
+return additional ``click.Argument`` and ``click.Option`` items to add to the
+command line.
+
+See the Click_ manual for more details on available parameter types.
+
 In order to serve metrics on the HTTPS endpoint both ``ssl-private-key`` and
 ``ssl-public-key`` need to be define. The ssl certificate authority
 (i.e. ``ssl-ca``) is optional.
+
+
+Environment variables
+~~~~~~~~~~~~~~~~~~~~~
+
+Values from default arguments can also be supplied via environment variables.
+Variables names match the ``<envvar_prefix>_<option_with_underscores`` format,
+so, for instance, the ``--port`` option can be provided as ``MYEXP_PORT=9091``
+(assuming the ``PrometheusExporterScript.envvar_prefix`` is set to ``MYEXP``).
+
+Provided command-line options take precedence over environment variables.
+
+It's also possible to provide environment variables via dotenv file. By default
+``.env`` is looked up in the current working directory. The file to load can be
+overridden by setting the file path via the ``<envvar_prefix>_DOTENV``
+variable.
+
+Explicitly provided environment variables take precedence over the ones defined
+in the dotenv file.
 
 
 Startup configuration
@@ -113,7 +145,7 @@ Startup configuration
 
 Additional initial setup (e.g. config file parsing) can be performed by the
 script by implementing the ``configure()``. This is called at startup with the
-parsed argument (an ``argparse.Namespace`` instance).
+parsed arguments (an ``Arguments`` instance).
 
 
 Metrics configuration
@@ -124,7 +156,7 @@ with a list of ``MetricConfig``\s. This is typically done in ``configure()``:
 
 .. code:: python
 
-    def configure(self, args: argparse.Namespace) -> None:
+    def configure(self, args: Arguments) -> None:
         # ...
         self.create_metrics(
             [
@@ -166,6 +198,8 @@ run as ``prometheus-aioexporter-sample``).
 
 
 .. _Prometheus: https://prometheus.io/
+.. _Click: https://click.palletsprojects.com/en/stable/
+.. _sample script: ./prometheus_aioexporter/sample.py
 
 .. |Latest Version| image:: https://img.shields.io/pypi/v/prometheus-aioexporter.svg
    :alt: Latest Version
