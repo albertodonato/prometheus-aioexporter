@@ -14,6 +14,9 @@ class LogFormat(StrEnum):
     PLAIN = "plain"
     JSON = "json"
 
+    def __repr__(self) -> str:
+        return self.value
+
 
 class LogLevel(StrEnum):
     """Log output level."""
@@ -27,6 +30,9 @@ class LogLevel(StrEnum):
     def num_level(self) -> int:
         """Return the numeric level."""
         return cast(int, getattr(logging, self.name))
+
+    def __repr__(self) -> str:
+        return self.value
 
 
 class AccessLogger(AbstractAccessLogger):

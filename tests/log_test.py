@@ -18,6 +18,10 @@ class TestLogLevel:
     def test_num_level(self, level: LogLevel) -> None:
         assert level.num_level() == getattr(logging, level.name)
 
+    @pytest.mark.parametrize("level", list(LogLevel))
+    def test_repr(self, level: LogLevel) -> None:
+        assert repr(level) == level.value
+
 
 class TestSetupLogging:
     @pytest.mark.parametrize("format", [LogFormat.PLAIN, LogFormat.JSON])
@@ -31,6 +35,10 @@ class TestSetupLogging:
         assert event["level"] == "info"
         assert "timestamp" in event
         assert event["some"] == "context"
+
+    @pytest.mark.parametrize("format", [LogFormat.PLAIN, LogFormat.JSON])
+    def test_repr(self, format: LogFormat) -> None:
+        assert repr(format) == format.value
 
 
 class TestAccessLogger:
