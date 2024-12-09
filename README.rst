@@ -4,7 +4,7 @@ Asyncio library for creating Prometheus exporters
 |Latest Version| |Build Status|
 
 ``prometheus-aioexporter`` is an aysncio-based library to simplify writing
-Prometheus_ exporters.
+Prometheus_ exporters in Python.
 
 Exporters are usually implemented as small daemons that expose metrics
 in text format through a web endpoint (usually ``/metrics``).
@@ -51,14 +51,14 @@ An example usage is the following:
             self, application: aiohttp.web.Application
         ) -> None:
             # Start other asyncio tasks at application startup
-            use(self.data)
+            do_something_with(self.data)
             # ...
 
         async def on_application_shutdown(
             self, application: aiohttp.web.Application
         ) -> None:
             # Stop other asyncio tasks at application shutdown
-            use(self.data)
+            do_more_with(self.data)
             # ...
 
 
@@ -177,7 +177,7 @@ implementing the ``on_application_startup`` and ``on_application_shutdown``
 coroutine methods, which are called with the application as parameter.
 
 The ``PrometheusExporter`` instance is accessible via
-``application['exporter']``), and provides a ``set_metric_update_handler``
+``application["exporter"]``), and provides a ``set_metric_update_handler``
 method to register a hook to update metrics on each request, before the
 response is returned to the client.  The registered function must return a
 coroutine and is called with a dict mapping metric names to metric objects:

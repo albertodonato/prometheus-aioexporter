@@ -1,3 +1,24 @@
+3.0.0 - 2024-12-13
+==================
+
+- Rework ``PrometheusExporterScript`` class, using ``click`` for command line
+  parsing.
+- Rework logging based on ``structlog``, support structured logging output as
+  JSON.
+- Support reading configuration options from environment variables.
+- Support reading configuration from `.env` file.
+
+**Note**: this version contains incompatible changes with the ``2.x`` series:
+- Command-line parsing is now provided by the ``click`` library. To provide
+  additional command-line options, the ``command_line_parameters()`` method
+  should be implemented, returning a list of ``click.Parameter`` subclasses
+  (e.g. ``click.Option`` or ``click.Argument``)
+- The ``structlog`` library is used for logging, providing support for
+  structured logging. The logger API is essentially backwards compatible with
+  the builtin ``logging`` module, with the added ability of passing keyword
+  arguments for structured logging.
+
+
 2.1.0 - 2024-11-20
 ==================
 
