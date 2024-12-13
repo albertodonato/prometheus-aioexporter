@@ -86,6 +86,7 @@ Exporter command-line
 ``PrometheusExporterScript`` provides a few command-line arguments by default:
 
 .. code::
+
     Options:
       -H, --host TEXT                 host addresses to bind  [env var: EXP_HOST;
                                       default: localhost]
