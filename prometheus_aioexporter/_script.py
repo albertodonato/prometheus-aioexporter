@@ -145,7 +145,7 @@ class PrometheusExporterScript:
         if not dotenv_file.is_file():
             return
 
-        self.logger.exception("dotenv", path=str(dotenv_file.absolute()))
+        self.logger.debug("load dotenv", path=str(dotenv_file.absolute()))
         load_dotenv(dotenv_file)
 
     def _base_parameters(self) -> list[click.Parameter]:
