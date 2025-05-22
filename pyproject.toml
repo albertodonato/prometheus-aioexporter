@@ -42,7 +42,6 @@ dependencies = [
   "click",
   "prometheus-client>=0.4",
   "python-dotenv",
-  "rich",                   # for nice tracebacks
   "structlog",
 ]
 optional-dependencies.testing = [
