@@ -10,6 +10,7 @@ from textwrap import dedent
 import typing as t
 
 from aiohttp.web import (
+    AppKey,
     Application,
     Request,
     Response,
@@ -24,6 +25,9 @@ from ._metric import MetricsRegistry
 
 # Signature for update handler
 UpdateHandler = Callable[[dict[str, MetricWrapperBase]], Awaitable[None]]
+
+# The application key to get the exporter from the configuration.
+EXPORTER_APP_KEY: AppKey["PrometheusExporter"] = AppKey("exporter")
 
 
 class PrometheusExporter:
@@ -87,7 +91,7 @@ class PrometheusExporter:
     def _make_application(self) -> Application:
         """Setup an :class:`aiohttp.web.Application`."""
         app = Application(logger=t.cast(logging.Logger, self.logger))
-        app["exporter"] = self
+        app[EXPORTER_APP_KEY] = self
         app.router.add_get("/", self._handle_home)
         app.router.add_get(self.metrics_path, self._handle_metrics)
         app.on_startup.append(self._log_startup_message)

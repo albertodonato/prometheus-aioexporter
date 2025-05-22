@@ -9,6 +9,7 @@ from prometheus_client import (
 from prometheus_client.metrics import MetricWrapperBase
 
 from . import (
+    EXPORTER_APP_KEY,
     Arguments,
     MetricConfig,
     PrometheusExporterScript,
@@ -34,7 +35,9 @@ class SampleScript(PrometheusExporterScript):
         )
 
     async def on_application_startup(self, application: Application) -> None:
-        application["exporter"].set_metric_update_handler(self._update_handler)
+        application[EXPORTER_APP_KEY].set_metric_update_handler(
+            self._update_handler
+        )
 
     async def _update_handler(
         self, metrics: dict[str, MetricWrapperBase]

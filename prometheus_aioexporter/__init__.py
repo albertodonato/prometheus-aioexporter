@@ -6,14 +6,15 @@ from ._metric import (
     MetricsRegistry,
 )
 from ._script import Arguments, PrometheusExporterScript
+from ._web import EXPORTER_APP_KEY
 
 __all__ = [
+    "EXPORTER_APP_KEY",
     "Arguments",
     "InvalidMetricType",
     "MetricConfig",
     "MetricsRegistry",
     "PrometheusExporterScript",
-    "__version__",
 ]
 
 __version__ = "3.0.2"

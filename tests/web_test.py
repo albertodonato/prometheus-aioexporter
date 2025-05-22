@@ -24,7 +24,7 @@ from prometheus_aioexporter._metric import (
     MetricConfig,
     MetricsRegistry,
 )
-from prometheus_aioexporter._web import PrometheusExporter
+from prometheus_aioexporter._web import EXPORTER_APP_KEY, PrometheusExporter
 
 from .conftest import ssl_context
 
@@ -74,7 +74,7 @@ class TestPrometheusExporter:
     def test_app_exporter_reference(
         self, exporter: PrometheusExporter
     ) -> None:
-        assert exporter.app["exporter"] is exporter
+        assert exporter.app[EXPORTER_APP_KEY] is exporter
 
     @pytest.mark.parametrize("exporter", [ssl_context, None], indirect=True)
     def test_run(

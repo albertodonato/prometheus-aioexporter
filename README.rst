@@ -178,7 +178,7 @@ implementing the ``on_application_startup`` and ``on_application_shutdown``
 coroutine methods, which are called with the application as parameter.
 
 The ``PrometheusExporter`` instance is accessible via
-``application["exporter"]``), and provides a ``set_metric_update_handler``
+``application[EXPORTER_APP_KEY]``), and provides a ``set_metric_update_handler``
 method to register a hook to update metrics on each request, before the
 response is returned to the client.  The registered function must return a
 coroutine and is called with a dict mapping metric names to metric objects:
@@ -187,7 +187,7 @@ coroutine and is called with a dict mapping metric names to metric objects:
 
     async def on_application_startup(self, application: aiohttp.web.Application) -> None:
         # ...
-        application["exporter"].set_metric_update_handler(self._update_handler)
+        application[EXPORTER_APP_KEY].set_metric_update_handler(self._update_handler)
 
     async def _update_handler(self, metrics: dict[str, prometheus_client.metrics.MetricWrapperBase]):
         for name, metric in metrics.items():
