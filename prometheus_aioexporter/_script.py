@@ -178,7 +178,7 @@ class PrometheusExporterScript:
             click.Option(
                 ["-L", "--log-level"],
                 help="minimum level for log messages",
-                type=click.Choice(LogLevel),
+                type=click.Choice(LogLevel, case_sensitive=False),
                 default=LogLevel.INFO,
                 show_default=True,
                 show_envvar=True,
@@ -186,7 +186,7 @@ class PrometheusExporterScript:
             click.Option(
                 ["--log-format"],
                 help="log output format",
-                type=click.Choice(LogFormat),
+                type=click.Choice(LogFormat, case_sensitive=False),
                 default=LogFormat.PLAIN,
                 show_default=True,
                 show_envvar=True,
@@ -194,6 +194,7 @@ class PrometheusExporterScript:
             click.Option(
                 ["--process-stats"],
                 help="include process stats in metrics",
+                type=bool,
                 is_flag=True,
                 show_default=True,
                 show_envvar=True,

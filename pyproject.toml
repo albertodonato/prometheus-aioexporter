@@ -39,7 +39,7 @@ dynamic = [
 ]
 dependencies = [
   "aiohttp>=3",
-  "click",
+  "click>=8.2",
   "prometheus-client>=0.4",
   "python-dotenv",
   "structlog",

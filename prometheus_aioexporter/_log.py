@@ -1,4 +1,4 @@
-from enum import StrEnum
+from enum import IntEnum, StrEnum
 from functools import cached_property
 import logging
 import typing as t
@@ -14,25 +14,18 @@ class LogFormat(StrEnum):
     PLAIN = "plain"
     JSON = "json"
 
-    def __repr__(self) -> str:
-        return self.value
 
-
-class LogLevel(StrEnum):
+class LogLevel(IntEnum):
     """Log output level."""
 
-    CRITICAL = "critical"
-    ERROR = "error"
-    WARNING = "warning"
-    INFO = "info"
-    DEBUG = "debug"
-
-    def num_level(self) -> int:
-        """Return the numeric level."""
-        return t.cast(int, getattr(logging, self.name))
+    CRITICAL = logging.CRITICAL
+    ERROR = logging.ERROR
+    WARNING = logging.WARNING
+    INFO = logging.INFO
+    DEBUG = logging.DEBUG
 
     def __repr__(self) -> str:
-        return self.value
+        return self.name
 
 
 class AccessLogger(AbstractAccessLogger):
@@ -78,7 +71,5 @@ def setup_logging(
 
     structlog.configure(
         processors=processors,
-        wrapper_class=structlog.make_filtering_bound_logger(
-            log_level.num_level()
-        ),
+        wrapper_class=structlog.make_filtering_bound_logger(log_level),
     )

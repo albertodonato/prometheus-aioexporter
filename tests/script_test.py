@@ -159,6 +159,22 @@ class TestPrometheusExporterScript:
     ) -> None:
         assert parse_arguments() == make_arguments(port=12345, test=False)
 
+    def test_arguments_from_cli_builtins(
+        self,
+        make_arguments: Callable[..., Arguments],
+        parse_arguments: Callable[..., Arguments],
+    ) -> None:
+        args = parse_arguments(
+            "--process-stats",
+            "--log-format",
+            "json",
+            "--log-level",
+            "debug",
+        )
+        assert args.process_stats
+        assert args.log_format == LogFormat.JSON
+        assert args.log_level == LogLevel.DEBUG
+
     def test_arguments_from_cli(
         self,
         make_arguments: Callable[..., Arguments],
