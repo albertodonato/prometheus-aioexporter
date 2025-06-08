@@ -1,3 +1,11 @@
+3.1.0 - 2025-06-08
+==================
+
+- fix: usage of click.Choice with enums
+- chore: require Click 8.2 or later
+- chore: use AppKey for keying the exporter in the application
+
+
 3.0.2 - 2025-05-22
 ==================
 
