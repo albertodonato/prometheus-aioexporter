@@ -7,13 +7,14 @@ requires = [
 [project]
 name = "prometheus-aioexporter"
 description = "Asyncio library for creating Prometheus exporters"
-readme = "README.rst"
+readme = { file = "README.txt", content-type = "text/x-rst" }
 keywords = [
   "exporter",
   "library",
   "prometheus",
 ]
-license = { file = "LICENSE.txt" }
+license = "LGPL-3.0-or-later"
+license-files = [ "LICENSE.txt" ]
 maintainers = [
   { name = "Alberto Donato", email = "alberto.donato@gmail.com" },
 ]
@@ -25,7 +26,6 @@ classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
   "Intended Audience :: System Administrators",
-  "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
