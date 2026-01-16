@@ -205,6 +205,6 @@ run as ``prometheus-aioexporter-sample``).
 .. |Latest Version| image:: https://img.shields.io/pypi/v/prometheus-aioexporter.svg
    :alt: Latest Version
    :target: https://pypi.python.org/pypi/prometheus-aioexporter
-.. |Build Status| image:: https://github.com/albertodonato/prometheus-aioexporter/workflows/CI/badge.svg
+.. |Build Status| image:: https://github.com/albertodonato/prometheus-aioexporter/actions/workflows/ci.yaml/badge.svg?branch=main
    :alt: Build Status
    :target: https://github.com/albertodonato/prometheus-aioexporter/actions?query=workflow%3ACI
