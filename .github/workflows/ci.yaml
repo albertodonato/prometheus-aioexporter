@@ -30,6 +30,7 @@ jobs:
           - "3.12"
           - "3.13"
 
+  test:
     name: Unit tests
     uses: ./.github/workflows/run-tox.yaml
     with:
