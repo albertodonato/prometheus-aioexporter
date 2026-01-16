@@ -10,70 +10,35 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Repository checkout
-        uses: actions/checkout@v5
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip tox
-
-      - name: Lint
-        run: |
-          tox run -e lint
+    name: Lint
+    uses: ./.github/workflows/run-tox.yaml
+    with:
+      python-version: "3.13"
+      tox-env: lint
 
   check:
-    runs-on: ubuntu-latest
+    name: Check
+    uses: ./.github/workflows/run-tox.yaml
+    with:
+      python-version: ${{ matrix.python-version }}
+      tox-env: check
+
     strategy:
       matrix:
         python-version:
           - "3.11"
           - "3.12"
           - "3.13"
-    steps:
-      - name: Repository checkout
-        uses: actions/checkout@v5
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
+    name: Unit tests
+    uses: ./.github/workflows/run-tox.yaml
+    with:
+      python-version: ${{ matrix.python-version }}
+      tox-env: coverage
 
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip tox
-
-      - name: Check
-        run: |
-          tox run -e check
-
-  test:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version:
           - "3.11"
           - "3.12"
           - "3.13"
-    steps:
-      - name: Repository checkout
-        uses: actions/checkout@v5
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip tox
-
-      - name: Test
-        run: |
-          tox run -e coverage
