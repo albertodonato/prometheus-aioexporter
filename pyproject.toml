@@ -58,7 +58,7 @@ urls."Homepage" = "https://github.com/albertodonato/prometheus-aioexporter"
 urls."Issue Tracker" = "https://github.com/albertodonato/prometheus-aioexporter/issues"
 urls."Release Notes" = "https://github.com/albertodonato/prometheus-aioexporter/blob/main/CHANGES.rst"
 urls."Repository" = "https://github.com/albertodonato/prometheus-aioexporter"
-urls."Source Code" = "https://github.com/albertodonato/query-exporter"
+urls."Source Code" = "https://github.com/albertodonato/prometheus-aioexporter"
 scripts.prometheus-aioexporter-sample = "prometheus_aioexporter.sample:script"
 
 [tool.setuptools.dynamic]
