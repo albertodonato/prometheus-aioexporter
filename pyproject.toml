@@ -61,35 +61,28 @@ urls."Repository" = "https://github.com/albertodonato/prometheus-aioexporter"
 urls."Source Code" = "https://github.com/albertodonato/prometheus-aioexporter"
 scripts.prometheus-aioexporter-sample = "prometheus_aioexporter.sample:script"
 
-[tool.setuptools.dynamic]
-version = { attr = "prometheus_aioexporter.__version__" }
-
-[tool.setuptools.package-data]
-prometheus_aioexporter = [ "py.typed" ]
-
-[tool.setuptools.packages.find]
-include = [ "prometheus_aioexporter*" ]
+[tool.setuptools]
+dynamic.version = { attr = "prometheus_aioexporter.__version__" }
+package-data.prometheus_aioexporter = [ "py.typed" ]
+packages.find.include = [ "prometheus_aioexporter*" ]
 
 [tool.ruff]
 line-length = 79
-
 lint.select = [ "F", "I", "RUF", "UP" ]
 lint.isort.combine-as-imports = true
 lint.isort.force-sort-within-sections = true
 
-[tool.pytest.ini_options]
-asyncio_mode = "auto"
-asyncio_default_fixture_loop_scope = "function"
-structlog_keep = [ "TimeStamper", "add_log_level", "JSONRenderer" ]
+[tool.pytest]
+ini_options.asyncio_mode = "auto"
+ini_options.asyncio_default_fixture_loop_scope = "function"
+ini_options.structlog_keep = [ "TimeStamper", "add_log_level", "JSONRenderer" ]
 
-[tool.coverage.report]
-fail_under = 100.0
-show_missing = true
-skip_covered = true
-
-[tool.coverage.run]
-source = [ "prometheus_aioexporter" ]
-omit = [ "prometheus_aioexporter/sample.py" ]
+[tool.coverage]
+run.omit = [ "prometheus_aioexporter/sample.py" ]
+run.source = [ "prometheus_aioexporter" ]
+report.fail_under = 100.0
+report.show_missing = true
+report.skip_covered = true
 
 [tool.mypy]
 install_types = true
