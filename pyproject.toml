@@ -16,10 +16,10 @@ keywords = [
 license = "LGPL-3.0-OR-later"
 license-files = [ "LICENSE.txt" ]
 maintainers = [
-  { name = "Alberto Donato", email = "alberto.donato@gmail.com" },
+  { name = "Alberto Donato", email = "alberto@albertodonato.net" },
 ]
 authors = [
-  { name = "Alberto Donato", email = "alberto.donato@gmail.com" },
+  { name = "Alberto Donato", email = "alberto@albertodonato.net" },
 ]
 requires-python = ">=3.11"
 classifiers = [
@@ -53,9 +53,12 @@ optional-dependencies.testing = [
   "pytest-structlog",
   "trustme",
 ]
-urls.changelog = "https://github.com/albertodonato/prometheus-aioexporter/blob/main/CHANGES.rst"
-urls.homepage = "https://github.com/albertodonato/prometheus-aioexporter"
-urls.repository = "https://github.com/albertodonato/prometheus-aioexporter"
+urls."Changelog" = "https://github.com/albertodonato/prometheus-aioexporter/blob/main/CHANGES.rst"
+urls."Homepage" = "https://github.com/albertodonato/prometheus-aioexporter"
+urls."Issue Tracker" = "https://github.com/albertodonato/prometheus-aioexporter/issues"
+urls."Release Notes" = "https://github.com/albertodonato/prometheus-aioexporter/blob/main/CHANGES.rst"
+urls."Repository" = "https://github.com/albertodonato/prometheus-aioexporter"
+urls."Source Code" = "https://github.com/albertodonato/query-exporter"
 scripts.prometheus-aioexporter-sample = "prometheus_aioexporter.sample:script"
 
 [tool.setuptools.dynamic]
