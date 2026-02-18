@@ -13,7 +13,7 @@ jobs:
     name: Lint
     uses: ./.github/workflows/run-tox.yaml
     with:
-      python-version: "3.13"
+      python-version: "3.14"
       tox-env: lint
 
   check:
@@ -29,6 +29,7 @@ jobs:
           - "3.11"
           - "3.12"
           - "3.13"
+          - "3.14"
 
   test:
     name: Unit tests
@@ -43,3 +44,4 @@ jobs:
           - "3.11"
           - "3.12"
           - "3.13"
+          - "3.14"
