@@ -194,8 +194,8 @@ coroutine and is called with a dict mapping metric names to metric objects:
             metric.set(...)
 
 
-See ``prometheus_aioexporter.sample`` for a complete example (the script can be
-run as ``prometheus-aioexporter-sample``).
+See ``prometheus_aioexporter.sample`` for a complete example (that can be run
+with ``python -m prometheus_aioexporter.sample``).
 
 
 .. _Prometheus: https://prometheus.io/

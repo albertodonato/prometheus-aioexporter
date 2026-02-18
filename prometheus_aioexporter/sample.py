@@ -54,3 +54,7 @@ class SampleScript(PrometheusExporterScript):
 
 
 script = SampleScript()
+
+
+if __name__ == "__main__":
+    script()
