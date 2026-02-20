@@ -2,6 +2,7 @@
 
 from collections.abc import Iterable
 from copy import deepcopy
+from importlib import metadata
 import os
 from pathlib import Path
 import ssl
@@ -60,7 +61,7 @@ class PrometheusExporterScript:
     name: str = "prometheus-exporter"
 
     # Exporter version, can be set by subclasses. If not defined, it will be
-    # detected from the package version
+    # detected from the package version.
     version: str | None = None
 
     # Default port for the exporter, can be changed by subclasses.
@@ -81,6 +82,7 @@ class PrometheusExporterScript:
     logger: structlog.stdlib.BoundLogger
 
     def __init__(self) -> None:
+        self._version = self._get_version()
         self.registry = MetricsRegistry()
         self.logger = structlog.get_logger()
         self.command = self._setup_command()
@@ -139,6 +141,19 @@ class PrometheusExporterScript:
     ) -> dict[str, MetricWrapperBase]:
         """Create and register metrics from a list of MetricConfigs."""
         return self.registry.create_metrics(metric_configs)
+
+    def _get_version(self) -> str:
+        version = self.version
+        if version is None:
+            try:
+                version = metadata.version(__package__)
+            except metadata.PackageNotFoundError:
+                version = None
+
+        if version is not None:
+            return version
+
+        return "unknown"
 
     def _process_dotenv(self) -> None:
         dotenv_file = Path(os.getenv(f"{self.envvar_prefix}_DOTENV", ".env"))
@@ -229,7 +244,8 @@ class PrometheusExporterScript:
             callback=self._command_callback,
         )
         command = click.version_option(
-            version=self.version, prog_name=self.name
+            prog_name=self.name,
+            version=self._version,
         )(command)
         return command
 
@@ -243,7 +259,7 @@ class PrometheusExporterScript:
     def _execute(self, args: Arguments) -> None:
         setup_logging(args.log_format, args.log_level)
         self.logger.info(
-            "startup", version=self.version, python_version=sys.version
+            "startup", version=self._version, python_version=sys.version
         )
         self.logger.debug("configuration", **args.dict())
         self._configure_registry(include_process_stats=args.process_stats)
@@ -279,4 +295,5 @@ class PrometheusExporterScript:
         )
         exporter.app.on_startup.append(self.on_application_startup)
         exporter.app.on_shutdown.append(self.on_application_shutdown)
+        return exporter
         return exporter

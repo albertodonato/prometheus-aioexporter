@@ -1,4 +1,5 @@
 from collections.abc import Callable, Iterator
+from importlib.metadata import PackageNotFoundError
 from pathlib import Path
 from ssl import SSLContext
 from textwrap import dedent
@@ -11,6 +12,7 @@ import pytest
 from pytest_mock import MockerFixture
 from pytest_structlog import StructuredLogCapture
 
+from prometheus_aioexporter import __version__
 from prometheus_aioexporter._log import AccessLogger, LogFormat, LogLevel
 from prometheus_aioexporter._metric import MetricConfig
 from prometheus_aioexporter._script import Arguments, PrometheusExporterScript
@@ -130,6 +132,28 @@ class TestArguments:
 
 @pytest.mark.usefixtures("log")
 class TestPrometheusExporterScript:
+    @pytest.mark.parametrize(
+        "set_version,expected",
+        [
+            (None, __version__),
+            ("1.2.3", "1.2.3"),
+        ],
+    )
+    def test_version(self, set_version: str | None, expected: str) -> None:
+        class Script(PrometheusExporterScript):
+            version = set_version
+
+        # the private attribute has the actual discovered version
+        assert Script()._version == expected
+
+    def test_version_unknown(self, mocker: MockerFixture) -> None:
+        mocker.patch(
+            "importlib.metadata.version",
+            side_effect=PackageNotFoundError,
+        )
+        script = PrometheusExporterScript()
+        assert script._version == "unknown"
+
     def test_description(self, script: PrometheusExporterScript) -> None:
         assert script.description == "A sample script"
 
