@@ -11,14 +11,14 @@ on:
 jobs:
   lint:
     name: Lint
-    uses: ./.github/workflows/run-tox.yaml
+    uses: albertodonato/github-workflows/.github/workflows/run-tox.yaml@de3f8a372eeb4ff134520743f33222075c67be89 # v.0.01
     with:
       python-version: "3.14"
       tox-env: lint
 
   check:
     name: Check
-    uses: ./.github/workflows/run-tox.yaml
+    uses: albertodonato/github-workflows/.github/workflows/run-tox.yaml@de3f8a372eeb4ff134520743f33222075c67be89 # v.0.01
     with:
       python-version: ${{ matrix.python-version }}
       tox-env: check
@@ -33,7 +33,7 @@ jobs:
 
   test:
     name: Unit tests
-    uses: ./.github/workflows/run-tox.yaml
+    uses: albertodonato/github-workflows/.github/workflows/run-tox.yaml@de3f8a372eeb4ff134520743f33222075c67be89 # v.0.01
     with:
       python-version: ${{ matrix.python-version }}
       tox-env: coverage
