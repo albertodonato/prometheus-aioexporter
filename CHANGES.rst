@@ -1,3 +1,10 @@
+3.1.1 - 2026-02-21
+==================
+
+- fix: report correct version in log when autodetected
+- chore(github): workflows updates and maintenance
+
+
 3.1.0 - 2025-06-08
 ==================
 
