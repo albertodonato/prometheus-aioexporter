@@ -1,8 +1,14 @@
+3.1.3 - 2026-02-22
+==================
+
+- fix: pyproject.toml readme metadata
+  
+
 3.1.2 - 2026-02-22
 ==================
 
-- fix: fix version autodetection
-  
+- fix: version autodetection
+
 
 3.1.1 - 2026-02-21
 ==================
