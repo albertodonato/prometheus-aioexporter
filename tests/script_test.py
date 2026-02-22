@@ -12,7 +12,6 @@ import pytest
 from pytest_mock import MockerFixture
 from pytest_structlog import StructuredLogCapture
 
-from prometheus_aioexporter import __version__
 from prometheus_aioexporter._log import AccessLogger, LogFormat, LogLevel
 from prometheus_aioexporter._metric import MetricConfig
 from prometheus_aioexporter._script import Arguments, PrometheusExporterScript
@@ -132,19 +131,21 @@ class TestArguments:
 
 @pytest.mark.usefixtures("log")
 class TestPrometheusExporterScript:
-    @pytest.mark.parametrize(
-        "set_version,expected",
-        [
-            (None, __version__),
-            ("1.2.3", "1.2.3"),
-        ],
-    )
-    def test_version(self, set_version: str | None, expected: str) -> None:
+    def test_version_set(self) -> None:
         class Script(PrometheusExporterScript):
-            version = set_version
+            version = "1.2.3"
 
-        # the private attribute has the actual discovered version
-        assert Script()._version == expected
+        assert Script()._version == "1.2.3"
+
+    def test_version_detected(self, mocker: MockerFixture) -> None:
+        mocker.patch(
+            "importlib.metadata.version",
+            return_value="1.2.3",
+        )
+
+        class Script(PrometheusExporterScript): ...
+
+        assert Script()._version == "1.2.3"
 
     def test_version_unknown(self, mocker: MockerFixture) -> None:
         mocker.patch(

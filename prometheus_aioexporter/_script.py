@@ -143,17 +143,17 @@ class PrometheusExporterScript:
         return self.registry.create_metrics(metric_configs)
 
     def _get_version(self) -> str:
-        version = self.version
-        if version is None:
-            try:
-                version = metadata.version(__package__)
-            except metadata.PackageNotFoundError:
-                version = None
+        if self.version is not None:
+            return self.version
 
-        if version is not None:
-            return version
+        module_name = type(self).__module__
+        package_name = module_name.partition(".")[0]
+        try:
+            version = metadata.version(package_name)
+        except metadata.PackageNotFoundError:
+            version = None
 
-        return "unknown"
+        return version if version else "unknown"
 
     def _process_dotenv(self) -> None:
         dotenv_file = Path(os.getenv(f"{self.envvar_prefix}_DOTENV", ".env"))
