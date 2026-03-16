@@ -12,19 +12,21 @@ commands = [ [ "mypy", "prometheus_aioexporter", "tests", { replace = "posargs",
 
 [env.format]
 package = "skip"
+dependency_groups = [ "dev" ]
 commands = [
-  [ "uv", "tool", "run", "ruff", "format", "prometheus_aioexporter", "tests" ],
-  [ "uv", "tool", "run", "ruff", "check", "--fix", "prometheus_aioexporter", "tests" ],
-  [ "-", "uv", "tool", "run", "pyproject-fmt", "pyproject.toml" ],
-  [ "-", "uv", "tool", "run", "tox-toml-fmt", "tox.toml" ],
+  [ "ruff", "format", "prometheus_aioexporter", "tests" ],
+  [ "ruff", "check", "--fix", "prometheus_aioexporter", "tests" ],
+  [ "-", "pyproject-fmt", "pyproject.toml" ],
+  [ "-", "tox-toml-fmt", "tox.toml" ],
 ]
 
 [env.lint]
 package = "skip"
+dependency_groups = [ "dev" ]
 commands = [
-  [ "uv", "tool", "run", "ruff", "check", "prometheus_aioexporter", "tests" ],
-  [ "uv", "tool", "run", "pyproject-fmt", "--check", "pyproject.toml" ],
-  [ "uv", "tool", "run", "tox-toml-fmt", "--check", "tox.toml" ],
+  [ "ruff", "check", "prometheus_aioexporter", "tests" ],
+  [ "pyproject-fmt", "--check", "pyproject.toml" ],
+  [ "tox-toml-fmt", "--check", "tox.toml" ],
 ]
 
 [env.sample]

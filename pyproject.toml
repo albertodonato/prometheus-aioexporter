@@ -55,8 +55,11 @@ urls.Repository = "https://github.com/albertodonato/prometheus-aioexporter"
 [dependency-groups]
 dev = [
   "mypy",
+  "pyproject-fmt",
   "pytest",
   "pytest-cov",
+  "ruff",
+  "tox-toml-fmt",
 ]
 tests = [
   "pytest-aiohttp",
@@ -77,6 +80,9 @@ lint.select = [ "F", "I", "RUF", "UP" ]
 lint.isort.combine-as-imports = true
 lint.isort.force-sort-within-sections = true
 
+[tool.mypy]
+strict = true
+
 [tool.pytest]
 ini_options.asyncio_mode = "auto"
 ini_options.asyncio_default_fixture_loop_scope = "function"
@@ -88,6 +94,3 @@ run.source = [ "prometheus_aioexporter" ]
 report.fail_under = 100.0
 report.show_missing = true
 report.skip_covered = true
-
-[tool.mypy]
-strict = true
