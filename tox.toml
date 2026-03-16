@@ -1,0 +1,34 @@
+requires = [ "tox>=4.6" ]
+
+[env_run_base]
+runner = "uv-venv-runner"
+package = "wheel"
+dependency_groups = [ "dev", "tests" ]
+commands = [ [ "pytest", { replace = "posargs", default = [ "--cov", "prometheus_aioexporter/" ], extend = true } ] ]
+
+[env.check]
+dependency_groups = [ "dev", "tests" ]
+commands = [ [ "mypy", "prometheus_aioexporter", "tests", { replace = "posargs", default = [], extend = true } ] ]
+
+[env.format]
+package = "skip"
+commands = [
+  [ "uv", "tool", "run", "ruff", "format", "prometheus_aioexporter", "tests" ],
+  [ "uv", "tool", "run", "ruff", "check", "--fix", "prometheus_aioexporter", "tests" ],
+  [ "-", "uv", "tool", "run", "pyproject-fmt", "pyproject.toml" ],
+  [ "-", "uv", "tool", "run", "tox-toml-fmt", "tox.toml" ],
+]
+
+[env.lint]
+package = "skip"
+commands = [
+  [ "uv", "tool", "run", "ruff", "check", "prometheus_aioexporter", "tests" ],
+  [ "uv", "tool", "run", "pyproject-fmt", "--check", "pyproject.toml" ],
+  [ "uv", "tool", "run", "tox-toml-fmt", "--check", "tox.toml" ],
+]
+
+[env.sample]
+package = "editable"
+commands = [
+  [ "python", "-m", "prometheus_aioexporter.sample", { replace = "posargs", default = [], extend = true } ],
+]

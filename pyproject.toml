@@ -45,20 +45,26 @@ dependencies = [
   "python-dotenv",
   "structlog",
 ]
-optional-dependencies.testing = [
+urls."Issue Tracker" = "https://github.com/albertodonato/prometheus-aioexporter/issues"
+urls."Release Notes" = "https://github.com/albertodonato/prometheus-aioexporter/blob/main/CHANGES.rst"
+urls."Source Code" = "https://github.com/albertodonato/prometheus-aioexporter"
+urls.Changelog = "https://github.com/albertodonato/prometheus-aioexporter/blob/main/CHANGES.rst"
+urls.Homepage = "https://github.com/albertodonato/prometheus-aioexporter"
+urls.Repository = "https://github.com/albertodonato/prometheus-aioexporter"
+
+[dependency-groups]
+dev = [
+  "mypy",
   "pytest",
+  "pytest-cov",
+]
+tests = [
   "pytest-aiohttp",
   "pytest-asyncio",
   "pytest-mock",
   "pytest-structlog",
   "trustme",
 ]
-urls."Changelog" = "https://github.com/albertodonato/prometheus-aioexporter/blob/main/CHANGES.rst"
-urls."Homepage" = "https://github.com/albertodonato/prometheus-aioexporter"
-urls."Issue Tracker" = "https://github.com/albertodonato/prometheus-aioexporter/issues"
-urls."Release Notes" = "https://github.com/albertodonato/prometheus-aioexporter/blob/main/CHANGES.rst"
-urls."Repository" = "https://github.com/albertodonato/prometheus-aioexporter"
-urls."Source Code" = "https://github.com/albertodonato/prometheus-aioexporter"
 
 [tool.setuptools]
 dynamic.version = { attr = "prometheus_aioexporter.__version__" }
@@ -84,6 +90,4 @@ report.show_missing = true
 report.skip_covered = true
 
 [tool.mypy]
-install_types = true
-non_interactive = true
 strict = true
