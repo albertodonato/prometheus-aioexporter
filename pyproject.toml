@@ -55,6 +55,7 @@ urls.Repository = "https://github.com/albertodonato/prometheus-aioexporter"
 [dependency-groups]
 dev = [
   "mypy",
+  "pre-commit",
   "pyproject-fmt",
   "pytest",
   "pytest-cov",
