@@ -10,24 +10,10 @@ commands = [ [ "pytest", { replace = "posargs", default = [ "--cov", "prometheus
 dependency_groups = [ "dev", "tests" ]
 commands = [ [ "mypy", "prometheus_aioexporter", "tests", { replace = "posargs", default = [], extend = true } ] ]
 
-[env.format]
-package = "skip"
-dependency_groups = [ "dev" ]
-commands = [
-  [ "ruff", "format", "prometheus_aioexporter", "tests" ],
-  [ "ruff", "check", "--fix", "prometheus_aioexporter", "tests" ],
-  [ "-", "pyproject-fmt", "pyproject.toml" ],
-  [ "-", "tox-toml-fmt", "tox.toml" ],
-]
-
 [env.lint]
 package = "skip"
 dependency_groups = [ "dev" ]
-commands = [
-  [ "ruff", "check", "prometheus_aioexporter", "tests" ],
-  [ "pyproject-fmt", "--check", "pyproject.toml" ],
-  [ "tox-toml-fmt", "--check", "tox.toml" ],
-]
+commands = [ [ "pre-commit", "run", "--all-files" ] ]
 
 [env.sample]
 package = "editable"
