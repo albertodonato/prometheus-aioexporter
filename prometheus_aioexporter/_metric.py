@@ -102,7 +102,7 @@ class MetricsRegistry:
         return self._metrics.copy()
 
     def register_additional_collector(self, collector: Collector) -> None:
-        """Registrer an additional collector or metric.
+        """Register an additional collector or metric.
 
         Metric(s) for the collector will not be include in the result of
         get_metrics.

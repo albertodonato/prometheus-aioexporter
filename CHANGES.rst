@@ -197,7 +197,7 @@ v0.2.2 - 2017-03-04
 v0.2.1 - 2017-02-28
 ===================
 
-- Readd ``PrometheusExporterScript.create_metrics``.
+- Re-add ``PrometheusExporterScript.create_metrics``.
 - Fix lint issues.
 
 

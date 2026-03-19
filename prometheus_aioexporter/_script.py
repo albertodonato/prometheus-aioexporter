@@ -130,7 +130,7 @@ class PrometheusExporterScript:
         """
 
     def configure(self, args: Arguments) -> None:
-        """Perform additional confguration steps at script startup.
+        """Perform additional configuration steps at script startup.
 
         Subclasses can implement this.
 
