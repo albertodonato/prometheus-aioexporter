@@ -8,7 +8,7 @@ commands = [ [ "pytest", { replace = "posargs", default = [ "--cov", "prometheus
 
 [env.check]
 dependency_groups = [ "dev", "tests" ]
-commands = [ [ "mypy", "prometheus_aioexporter", "tests", { replace = "posargs", default = [], extend = true } ] ]
+commands = [ [ "ty", "check", { replace = "posargs", default = [], extend = true } ] ]
 
 [env.lint]
 package = "skip"
