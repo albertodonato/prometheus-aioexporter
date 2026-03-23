@@ -15,8 +15,8 @@ from prometheus_client import (
     Histogram,
     Info,
     Summary,
-    generate_latest,
 )
+from prometheus_client.exposition import choose_encoder
 from prometheus_client.metrics import MetricWrapperBase
 from prometheus_client.registry import Collector
 
@@ -68,6 +68,14 @@ class InvalidMetricType(Exception):
         )
 
 
+@dataclass
+class EncodedMetrics:
+    """Encoded metrics content."""
+
+    content_type: str
+    content: bytes
+
+
 class MetricsRegistry:
     """A registry for metrics."""
 
@@ -110,9 +118,16 @@ class MetricsRegistry:
         """
         self.registry.register(collector)
 
-    def generate_metrics(self) -> bytes:
-        """Generate text with metrics values from the registry."""
-        return bytes(generate_latest(self.registry))
+    def encode_metrics(self, accept_header: str = "") -> EncodedMetrics:
+        """Generate encoded metrics content.
+
+        The format and Content-Type is determined by the specified Accept
+        header.
+
+        """
+        encoder, content_type = choose_encoder(accept_header)
+        content = encoder(self.registry)
+        return EncodedMetrics(content_type, content)
 
     def _register_metric(self, config: MetricConfig) -> MetricWrapperBase:
         metric_type = METRIC_TYPES[config.type]

@@ -125,12 +125,28 @@ class TestMetricsRegistry:
             ),
         ],
     )
-    def test_generate_metrics(
+    @pytest.mark.parametrize(
+        "accept_header,content_type",
+        [
+            (
+                "text/plain;version=0.0.4",
+                "text/plain; version=0.0.4; charset=utf-8",
+            ),
+            (
+                "application/openmetrics-text;version=1.0.0",
+                "application/openmetrics-text; version=1.0.0; charset=utf-8; escaping=underscores",
+            ),
+            ("", "text/plain; version=0.0.4; charset=utf-8"),
+        ],
+    )
+    def test_encode_metrics(
         self,
         metric_type: str,
         config: dict[str, t.Any],
         action: Callable[[MetricWrapperBase], None],
         text: str,
+        accept_header: str,
+        content_type: str,
     ) -> None:
         registry = MetricsRegistry()
         name = "test_" + metric_type
@@ -138,4 +154,6 @@ class TestMetricsRegistry:
             [MetricConfig(name, "A test metric", metric_type, config=config)]
         )
         action(metrics[name])
-        assert text in registry.generate_metrics().decode("utf-8")
+        encoded = registry.encode_metrics(accept_header=accept_header)
+        assert encoded.content_type == content_type
+        assert text in encoded.content.decode("utf-8")

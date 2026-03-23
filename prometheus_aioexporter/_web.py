@@ -16,7 +16,6 @@ from aiohttp.web import (
     Response,
     run_app,
 )
-from prometheus_client import CONTENT_TYPE_LATEST
 from prometheus_client.metrics import MetricWrapperBase
 import structlog
 
@@ -138,6 +137,8 @@ class PrometheusExporter:
         """Handler for metrics."""
         if self._update_handler:
             await self._update_handler(self.registry.get_metrics())
-        response = Response(body=self.registry.generate_metrics())
-        response.content_type = CONTENT_TYPE_LATEST
+        accept_header = request.headers.get("Accept", "")
+        encoded = self.registry.encode_metrics(accept_header=accept_header)
+        response = Response(body=encoded.content)
+        response.content_type = encoded.content_type
         return response
