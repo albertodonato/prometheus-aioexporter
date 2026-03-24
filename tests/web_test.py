@@ -106,10 +106,10 @@ class TestPrometheusExporter:
         ssl_client_context: SSLContext | bool = False
         if exporter.ssl_context is not None:
             ssl_client_context = ssl_context_server
-        request = await client.request("GET", "/", ssl=ssl_client_context)
-        assert request.status == 200
-        assert request.content_type == "text/html"
-        text = await request.text()
+        response = await client.request("GET", "/", ssl=ssl_client_context)
+        assert response.status == 200
+        assert response.content_type == "text/html"
+        text = await response.text()
         assert "<title>test-app - A test application</title>" in text
 
     async def test_homepage_no_description(
@@ -119,17 +119,33 @@ class TestPrometheusExporter:
     ) -> None:
         exporter.description = ""
         client = await aiohttp_client(exporter.app)
-        request = await client.request("GET", "/")
-        assert request.status == 200
-        assert request.content_type == "text/html"
-        text = await request.text()
+        response = await client.request("GET", "/")
+        assert response.status == 200
+        assert response.content_type == "text/html"
+        text = await response.text()
         assert "<title>test-app</title>" in text
 
+    @pytest.mark.parametrize(
+        "accept_header,content_type",
+        [
+            (
+                "text/plain;version=0.0.4",
+                "text/plain; version=0.0.4; charset=utf-8",
+            ),
+            (
+                "application/openmetrics-text;version=1.0.0",
+                "application/openmetrics-text; version=1.0.0; charset=utf-8; escaping=underscores",
+            ),
+            ("", "text/plain; version=0.0.4; charset=utf-8"),
+        ],
+    )
     async def test_metrics(
         self,
         aiohttp_client: AiohttpClient,
         exporter: PrometheusExporter,
         registry: MetricsRegistry,
+        accept_header: str,
+        content_type: str,
     ) -> None:
         metrics = registry.create_metrics(
             [MetricConfig("test_gauge", "A test gauge", "gauge")]
@@ -137,10 +153,12 @@ class TestPrometheusExporter:
         gauge = t.cast(Gauge, metrics["test_gauge"])
         gauge.set(12.3)
         client = await aiohttp_client(exporter.app)
-        request = await client.request("GET", "/metrics")
-        assert request.status == 200
-        assert request.content_type == "text/plain"
-        text = await request.text()
+        response = await client.request(
+            "GET", "/metrics", headers={"Accept": accept_header}
+        )
+        assert response.status == 200
+        assert response.headers["Content-Type"] == content_type
+        text = await response.text()
         assert "HELP test_gauge A test gauge" in text
         assert "test_gauge 12.3" in text
 
@@ -165,15 +183,15 @@ class TestPrometheusExporter:
         gaute = t.cast(Gauge, metrics["test_gauge"])
         gaute.set(12.3)
         client = await aiohttp_client(exporter.app)
-        request = await client.request("GET", "/other-path")
-        assert request.status == 200
-        assert request.content_type == "text/plain"
-        text = await request.text()
+        response = await client.request("GET", "/other-path")
+        assert response.status == 200
+        assert response.content_type == "text/plain"
+        text = await response.text()
         assert "HELP test_gauge A test gauge" in text
         assert "test_gauge 12.3" in text
         # the /metrics path doesn't exist
-        request = await client.request("GET", "/metrics")
-        assert request.status == 404
+        response = await client.request("GET", "/metrics")
+        assert response.status == 404
 
     async def test_metrics_update_handler(
         self,
