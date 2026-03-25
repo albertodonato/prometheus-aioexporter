@@ -50,9 +50,7 @@ def ssl_context(tls_certificate: LeafCert) -> Iterator[ssl.SSLContext]:
 
 
 @pytest.fixture
-def ssl_context_server(
-    ca: CA, tls_public_key_path: str
-) -> Iterator[ssl.SSLContext]:
+def ssl_context_server(ca: CA) -> Iterator[ssl.SSLContext]:
     """SSL context for server authentication."""
     ssl_ctx = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH)
     ca.configure_trust(ssl_ctx)

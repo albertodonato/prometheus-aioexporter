@@ -21,7 +21,7 @@ from ._metric import (
     MetricConfig,
     MetricsRegistry,
 )
-from ._web import PrometheusExporter
+from ._web import PrometheusExporter, PrometheusExporterConfig
 
 
 class Arguments:
@@ -60,9 +60,9 @@ class PrometheusExporterScript:
     # Name of the script, can be set by subsclasses.
     name: str = "prometheus-exporter"
 
-    # Exporter version, can be set by subclasses. If not defined, it will be
-    # detected from the package version.
-    version: str | None = None
+    # Exporter version, can be set by subclasses. If empty, it will be detected
+    # from the package version.
+    version: str = ""
 
     # Default port for the exporter, can be changed by subclasses.
     default_port: int = 9090
@@ -82,7 +82,7 @@ class PrometheusExporterScript:
     logger: structlog.stdlib.BoundLogger
 
     def __init__(self) -> None:
-        self._version = self._get_version()
+        self._ensure_version()
         self.registry = MetricsRegistry()
         self.logger = structlog.get_logger()
         self.command = self._setup_command()
@@ -142,18 +142,27 @@ class PrometheusExporterScript:
         """Create and register metrics from a list of MetricConfigs."""
         return self.registry.create_metrics(metric_configs)
 
-    def _get_version(self) -> str:
-        if self.version is not None:
-            return self.version
+    def _ensure_version(self) -> None:
+        """Detect and set package version if unset.
+
+        This must live in this class so that detection works for subclasses, as
+        the version needs to be found from the package that contains the
+        subclass definition.
+
+        """
+        if self.version:
+            return
 
         module_name = type(self).__module__
-        package_name = module_name.partition(".")[0]
-        try:
-            version = metadata.version(package_name)
-        except metadata.PackageNotFoundError:
-            version = None
+        version = ""
+        if spec := sys.modules[module_name].__spec__:
+            package_name = spec.name.partition(".")[0]
+            try:
+                version = metadata.version(package_name)
+            except metadata.PackageNotFoundError:
+                pass
 
-        return version if version else "unknown"
+        self.version = version or "unknown"
 
     def _process_dotenv(self) -> None:
         dotenv_file = Path(os.getenv(f"{self.envvar_prefix}_DOTENV", ".env"))
@@ -245,7 +254,7 @@ class PrometheusExporterScript:
         )
         command = click.version_option(
             prog_name=self.name,
-            version=self._version,
+            version=self.version,
         )(command)
         return command
 
@@ -259,7 +268,7 @@ class PrometheusExporterScript:
     def _execute(self, args: Arguments) -> None:
         setup_logging(args.log_format, args.log_level)
         self.logger.info(
-            "startup", version=self._version, python_version=sys.version
+            "startup", version=self.version, python_version=sys.version
         )
         self.logger.debug("configuration", **args.dict())
         self._configure_registry(include_process_stats=args.process_stats)
@@ -283,17 +292,18 @@ class PrometheusExporterScript:
         return ssl_context
 
     def _get_exporter(self, args: Arguments) -> PrometheusExporter:
-        exporter = PrometheusExporter(
+        config = PrometheusExporterConfig(
             self.name,
+            self.version,
             self.description,
             args.host,
             args.port,
-            self.registry,
             metrics_path=args.metrics_path,
             ssl_context=self._get_ssl_context(args),
-            logger=self.logger,
+        )
+        exporter = PrometheusExporter(
+            config, self.registry, logger=self.logger
         )
         exporter.app.on_startup.append(self.on_application_startup)
         exporter.app.on_shutdown.append(self.on_application_shutdown)
-        return exporter
         return exporter
