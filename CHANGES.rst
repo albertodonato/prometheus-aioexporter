@@ -1,3 +1,12 @@
+3.2.0 - 2026-03-26
+==================
+
+- feat: Add support for OpenMetrics format in addition to text one (based on
+  Accept header)
+- chore: group exporter configuration fields in its own class
+- chore: add more linting, switch to uv and ty
+
+
 3.1.3 - 2026-02-22
 ==================
 
