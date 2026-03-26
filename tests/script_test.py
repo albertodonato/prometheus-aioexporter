@@ -15,6 +15,7 @@ from pytest_structlog import StructuredLogCapture
 from prometheus_aioexporter._log import AccessLogger, LogFormat, LogLevel
 from prometheus_aioexporter._metric import MetricConfig
 from prometheus_aioexporter._script import Arguments, PrometheusExporterScript
+from prometheus_aioexporter._web import PrometheusExporterConfig
 
 
 class SampleScript(PrometheusExporterScript):
@@ -93,6 +94,13 @@ def parse_arguments(
     yield invoke
 
 
+def get_exporter_config(
+    script: PrometheusExporterScript, args: Arguments
+) -> PrometheusExporterConfig:
+    exporter = script._get_exporter(args)
+    return exporter.config
+
+
 class TestArguments:
     def test_repr(self) -> None:
         assert (
@@ -135,7 +143,7 @@ class TestPrometheusExporterScript:
         class Script(PrometheusExporterScript):
             version = "1.2.3"
 
-        assert Script()._version == "1.2.3"
+        assert Script().version == "1.2.3"
 
     def test_version_detected(self, mocker: MockerFixture) -> None:
         mocker.patch(
@@ -145,7 +153,7 @@ class TestPrometheusExporterScript:
 
         class Script(PrometheusExporterScript): ...
 
-        assert Script()._version == "1.2.3"
+        assert Script().version == "1.2.3"
 
     def test_version_unknown(self, mocker: MockerFixture) -> None:
         mocker.patch(
@@ -153,7 +161,7 @@ class TestPrometheusExporterScript:
             side_effect=PackageNotFoundError,
         )
         script = PrometheusExporterScript()
-        assert script._version == "unknown"
+        assert script.version == "unknown"
 
     def test_description(self, script: PrometheusExporterScript) -> None:
         assert script.description == "A sample script"
@@ -310,8 +318,8 @@ class TestPrometheusExporterScript:
         make_arguments: Callable[..., Arguments],
     ) -> None:
         args = make_arguments(metrics_path="/other-path")
-        exporter = script._get_exporter(args)
-        assert exporter.metrics_path == "/other-path"
+        config = get_exporter_config(script, args)
+        assert config.metrics_path == "/other-path"
 
     def test_only_ssl_key(
         self,
@@ -320,8 +328,8 @@ class TestPrometheusExporterScript:
         tls_private_key_path: str,
     ) -> None:
         args = make_arguments(ssl_private_key=tls_private_key_path)
-        exporter = script._get_exporter(args)
-        assert exporter.ssl_context is None
+        config = get_exporter_config(script, args)
+        assert config.ssl_context is None
 
     def test_only_ssl_cert(
         self,
@@ -330,8 +338,8 @@ class TestPrometheusExporterScript:
         tls_public_key_path: str,
     ) -> None:
         args = make_arguments(ssl_public_key=tls_public_key_path)
-        exporter = script._get_exporter(args)
-        assert exporter.ssl_context is None
+        config = get_exporter_config(script, args)
+        assert config.ssl_context is None
 
     def test_ssl_components_without_ca(
         self,
@@ -344,9 +352,9 @@ class TestPrometheusExporterScript:
             ssl_public_key=tls_public_key_path,
             ssl_private_key=tls_private_key_path,
         )
-        exporter = script._get_exporter(args)
-        assert isinstance(exporter.ssl_context, SSLContext)
-        assert len(exporter.ssl_context.get_ca_certs()) != 1
+        config = get_exporter_config(script, args)
+        assert isinstance(config.ssl_context, SSLContext)
+        assert len(config.ssl_context.get_ca_certs()) != 1
 
     def test_ssl_components(
         self,
@@ -361,9 +369,9 @@ class TestPrometheusExporterScript:
             ssl_private_key=tls_private_key_path,
             ssl_ca=tls_ca_path,
         )
-        exporter = script._get_exporter(args)
-        assert isinstance(exporter.ssl_context, SSLContext)
-        assert len(exporter.ssl_context.get_ca_certs()) == 1
+        config = get_exporter_config(script, args)
+        assert isinstance(config.ssl_context, SSLContext)
+        assert len(config.ssl_context.get_ca_certs()) == 1
 
     def test_include_process_stats(
         self,
