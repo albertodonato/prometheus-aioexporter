@@ -81,6 +81,9 @@ lint.select = [ "F", "I", "RUF", "UP" ]
 lint.isort.combine-as-imports = true
 lint.isort.force-sort-within-sections = true
 
+[tool.pyproject-fmt]
+expand_tables = [ "tool.tox" ]
+
 [tool.mypy]
 strict = true
 
@@ -95,3 +98,24 @@ run.source = [ "prometheus_aioexporter" ]
 report.fail_under = 100.0
 report.show_missing = true
 report.skip_covered = true
+
+[tool.tox.env.check]
+dependency_groups = [ "dev", "tests" ]
+commands = [ [ "ty", "check", { replace = "posargs", default = [], extend = true } ] ]
+
+[tool.tox.env.lint]
+package = "skip"
+dependency_groups = [ "dev" ]
+commands = [ [ "pre-commit", "run", "--all-files" ] ]
+
+[tool.tox.env.sample]
+package = "editable"
+commands = [
+  [ "python", "-m", "prometheus_aioexporter.sample", { replace = "posargs", default = [], extend = true } ],
+]
+
+[tool.tox.env_run_base]
+runner = "uv-venv-runner"
+package = "wheel"
+dependency_groups = [ "dev", "tests" ]
+commands = [ [ "pytest", { replace = "posargs", default = [ "--cov", "prometheus_aioexporter/" ], extend = true } ] ]
