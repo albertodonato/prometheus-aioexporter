@@ -84,9 +84,6 @@ lint.isort.force-sort-within-sections = true
 [tool.pyproject-fmt]
 expand_tables = [ "tool.tox" ]
 
-[tool.mypy]
-strict = true
-
 [tool.pytest]
 ini_options.asyncio_mode = "auto"
 ini_options.asyncio_default_fixture_loop_scope = "function"
