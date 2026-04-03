@@ -59,7 +59,6 @@ dev = [
   "pytest",
   "pytest-cov",
   "ruff",
-  "tox-toml-fmt",
   "ty",
 ]
 tests = [
