@@ -1,8 +1,6 @@
-from collections.abc import Callable
 import typing as t
 
 from prometheus_client import Histogram
-from prometheus_client.metrics import MetricWrapperBase
 import pytest
 
 from prometheus_aioexporter._metric import (
@@ -88,72 +86,3 @@ class TestMetricsRegistry:
         registry.create_metrics(configs)
         metric = registry.get_metric("m", {"l1": "v1", "l2": "v2"})
         assert metric._labelvalues == ("v1", "v2")
-
-    @pytest.mark.parametrize(
-        "metric_type,config,action,text",
-        [
-            (
-                "counter",
-                {},
-                lambda metric: metric.inc(),
-                "counter\ntest_counter_total 1.0",
-            ),
-            (
-                "enum",
-                {"states": ["on", "off"]},
-                lambda metric: metric.state("on"),
-                'test_enum{test_enum="on"}',
-            ),
-            ("gauge", {}, lambda metric: metric.set(12.3), "test_gauge 12.3"),
-            (
-                "histogram",
-                {"buckets": [10, 20]},
-                lambda metric: metric.observe(1.23),
-                'test_histogram_bucket{le="10.0"} 1.0',
-            ),
-            (
-                "info",
-                {},
-                lambda metric: metric.info({"foo": "bar", "baz": "bza"}),
-                'test_info_info{baz="bza",foo="bar"}',
-            ),
-            (
-                "summary",
-                {},
-                lambda metric: metric.observe(1.23),
-                "test_summary_sum 1.23",
-            ),
-        ],
-    )
-    @pytest.mark.parametrize(
-        "accept_header,content_type",
-        [
-            (
-                "text/plain;version=0.0.4",
-                "text/plain; version=0.0.4; charset=utf-8",
-            ),
-            (
-                "application/openmetrics-text;version=1.0.0",
-                "application/openmetrics-text; version=1.0.0; charset=utf-8; escaping=underscores",
-            ),
-            ("", "text/plain; version=0.0.4; charset=utf-8"),
-        ],
-    )
-    def test_encode_metrics(
-        self,
-        metric_type: str,
-        config: dict[str, t.Any],
-        action: Callable[[MetricWrapperBase], None],
-        text: str,
-        accept_header: str,
-        content_type: str,
-    ) -> None:
-        registry = MetricsRegistry()
-        name = "test_" + metric_type
-        metrics = registry.create_metrics(
-            [MetricConfig(name, "A test metric", metric_type, config=config)]
-        )
-        action(metrics[name])
-        encoded = registry.encode_metrics(accept_header=accept_header)
-        assert encoded.content_type == content_type
-        assert text in encoded.content.decode("utf-8")

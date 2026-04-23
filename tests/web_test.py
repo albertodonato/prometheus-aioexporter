@@ -139,6 +139,42 @@ class TestPrometheusExporter:
         assert response.headers["Server"] == "test-exporter/1.2.3"
 
     @pytest.mark.parametrize(
+        "metric_type,metric_config,action,metric_text",
+        [
+            (
+                "counter",
+                {},
+                lambda metric: metric.inc(),
+                "counter\ntest_counter_total 1.0",
+            ),
+            (
+                "enum",
+                {"states": ["on", "off"]},
+                lambda metric: metric.state("on"),
+                'test_enum{test_enum="on"}',
+            ),
+            ("gauge", {}, lambda metric: metric.set(12.3), "test_gauge 12.3"),
+            (
+                "histogram",
+                {"buckets": [10, 20]},
+                lambda metric: metric.observe(1.23),
+                'test_histogram_bucket{le="10.0"} 1.0',
+            ),
+            (
+                "info",
+                {},
+                lambda metric: metric.info({"foo": "bar", "baz": "bza"}),
+                'test_info_info{baz="bza",foo="bar"}',
+            ),
+            (
+                "summary",
+                {},
+                lambda metric: metric.observe(1.23),
+                "test_summary_sum 1.23",
+            ),
+        ],
+    )
+    @pytest.mark.parametrize(
         "accept_header,content_type",
         [
             (
@@ -157,14 +193,22 @@ class TestPrometheusExporter:
         aiohttp_client: AiohttpClientFixture,
         exporter: PrometheusExporter,
         registry: MetricsRegistry,
+        metric_type: str,
+        metric_config: dict[str, t.Any],
+        action: Callable[[MetricWrapperBase], None],
+        metric_text: str,
         accept_header: str,
         content_type: str,
     ) -> None:
+        name = "test_" + metric_type
         metrics = registry.create_metrics(
-            [MetricConfig("test_gauge", "A test gauge", "gauge")]
+            [
+                MetricConfig(
+                    name, "A test metric", metric_type, config=metric_config
+                )
+            ]
         )
-        gauge = t.cast(Gauge, metrics["test_gauge"])
-        gauge.set(12.3)
+        action(metrics[name])
         client = await aiohttp_client(exporter.app)
         response = await client.request(
             "GET", "/metrics", headers={"Accept": accept_header}
@@ -172,8 +216,7 @@ class TestPrometheusExporter:
         assert response.status == 200
         assert response.headers["Content-Type"] == content_type
         text = await response.text()
-        assert "HELP test_gauge A test gauge" in text
-        assert "test_gauge 12.3" in text
+        assert metric_text in text
 
     async def test_metrics_different_path(
         self,

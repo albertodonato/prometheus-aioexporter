@@ -15,8 +15,10 @@ from aiohttp.web import (
     Application,
     Request,
     Response,
+    StreamResponse,
     run_app,
 )
+from prometheus_client.aiohttp import make_aiohttp_handler
 from prometheus_client.metrics import MetricWrapperBase
 import structlog
 
@@ -67,6 +69,8 @@ class PrometheusExporter:
         self.logger = logger or structlog.get_logger()
         self.app = self._make_application()
 
+        self._metrics_handler = make_aiohttp_handler(self.registry.registry)
+
     def set_metric_update_handler(self, handler: UpdateHandler) -> None:
         """Set a handler to update metrics.
 
@@ -80,7 +84,7 @@ class PrometheusExporter:
         self._update_handler = handler
 
     def run(self) -> None:
-        """Run the :class:`aiohttp.web.Application` for the exporter."""
+        """Run the Application for the exporter."""
         run_app(
             self.app,
             host=self.config.hosts,
@@ -91,7 +95,7 @@ class PrometheusExporter:
         )
 
     def _make_application(self) -> Application:
-        """Setup an :class:`aiohttp.web.Application`."""
+        """Setup the aiohttp Application."""
         app = Application(logger=t.cast(logging.Logger, self.logger))
         app[EXPORTER_APP_KEY] = self
         app.router.add_get("/", self._handle_home)
@@ -138,12 +142,8 @@ class PrometheusExporter:
         )
         return Response(content_type="text/html", text=text)
 
-    async def _handle_metrics(self, request: Request) -> Response:
+    async def _handle_metrics(self, request: Request) -> StreamResponse:
         """Handler for metrics."""
         if self._update_handler:
             await self._update_handler(self.registry.get_metrics())
-        accept_header = request.headers.get("Accept", "")
-        encoded = self.registry.encode_metrics(accept_header=accept_header)
-        response = Response(body=encoded.content)
-        response.content_type = encoded.content_type
-        return response
+        return await self._metrics_handler(request)
