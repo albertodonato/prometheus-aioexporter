@@ -70,9 +70,9 @@ tests = [
 ]
 
 [tool.setuptools]
-dynamic.version = { attr = "prometheus_aioexporter.__version__" }
-package-data.prometheus_aioexporter = [ "py.typed" ]
 packages.find.include = [ "prometheus_aioexporter*" ]
+package-data.prometheus_aioexporter = [ "py.typed" ]
+dynamic.version = { attr = "prometheus_aioexporter.__version__" }
 
 [tool.ruff]
 line-length = 79
@@ -84,8 +84,8 @@ lint.isort.force-sort-within-sections = true
 expand_tables = [ "tool.tox" ]
 
 [tool.pytest]
-ini_options.asyncio_mode = "auto"
 ini_options.asyncio_default_fixture_loop_scope = "function"
+ini_options.asyncio_mode = "auto"
 ini_options.structlog_keep = [ "TimeStamper", "add_log_level", "JSONRenderer" ]
 
 [tool.coverage]
