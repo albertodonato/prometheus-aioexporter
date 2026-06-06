@@ -25,7 +25,7 @@ An example usage is the following:
 .. code:: python
 
     import click
-    from prometheus_aioexporter import Arguments, PrometheusExporterScript
+    from prometheus_aioexporter import Arguments, MetricType, PrometheusExporterScript
 
 
     class MyExporter(PrometheusExporterScript):
@@ -41,6 +41,13 @@ An example usage is the following:
                 click.Option(["--custom-option"], help="a custom option"),
                 ...
             ]
+
+        def metric_types(self) -> list[MetricType]:
+           # Optionally override available metric types and their classes.
+           return [
+               MetricType("enum", MyEnum, options=["states"]),
+               ...
+           ]
 
         def configure(self, args: Arguments) -> None:
             # Save attributes that are needed for later
