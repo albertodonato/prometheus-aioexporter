@@ -8,12 +8,13 @@ from unittest import mock
 
 import click
 from click.testing import CliRunner, Result
+from prometheus_client import Gauge
 import pytest
 from pytest_mock import MockerFixture
 from pytest_structlog import StructuredLogCapture
 
 from prometheus_aioexporter._log import AccessLogger, LogFormat, LogLevel
-from prometheus_aioexporter._metric import MetricConfig
+from prometheus_aioexporter._metric import MetricConfig, MetricType
 from prometheus_aioexporter._script import Arguments, PrometheusExporterScript
 from prometheus_aioexporter._web import PrometheusExporterConfig
 
@@ -311,6 +312,22 @@ class TestPrometheusExporterScript:
         assert len(metrics) == 2
         assert metrics["m1"]._type == "counter"
         assert metrics["m2"]._type == "histogram"
+
+    def test_custom_metric_types(self) -> None:
+        class CustomGauge(Gauge): ...
+
+        class CustomScript(PrometheusExporterScript):
+            name = "custom-script"
+            version = "1.0"
+
+            def metric_types(self) -> list[MetricType]:
+                return [MetricType("gauge", CustomGauge)]
+
+        script = CustomScript()
+        metrics = script.create_metrics(
+            [MetricConfig("m1", "desc1", "gauge", {})]
+        )
+        assert isinstance(metrics["m1"], CustomGauge)
 
     def test_change_metrics_path(
         self,
