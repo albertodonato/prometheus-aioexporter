@@ -1,24 +1,17 @@
 import typing as t
 
-from prometheus_client import Histogram
+from prometheus_client import Gauge, Histogram
 import pytest
 
 from prometheus_aioexporter._metric import (
     InvalidMetricType,
     MetricConfig,
     MetricsRegistry,
+    MetricType,
 )
 
 
 class TestMetricConfig:
-    def test_invalid_metric_type(self) -> None:
-        with pytest.raises(InvalidMetricType) as error:
-            MetricConfig("m1", "desc1", "unknown")
-        assert str(error.value) == (
-            "Invalid type for m1: must be one of counter, enum, "
-            "gauge, histogram, info, summary"
-        )
-
     def test_labels_sorted(self) -> None:
         config = MetricConfig("m", "desc", "counter", labels=["foo", "bar"])
         assert config.labels == ("bar", "foo")
@@ -52,6 +45,23 @@ class TestMetricsRegistry:
         ]
         metrics = MetricsRegistry().create_metrics(configs)
         assert len(metrics) == 1
+
+    def test_create_metrics_invalid_type(self) -> None:
+        configs = [MetricConfig("m1", "desc1", "unknown")]
+        with pytest.raises(InvalidMetricType) as error:
+            MetricsRegistry().create_metrics(configs)
+        assert str(error.value) == "Invalid type 'unknown' for metric 'm1'"
+
+    def test_create_metrics_custom_types(self) -> None:
+        class CustomGauge(Gauge): ...
+
+        registry = MetricsRegistry(
+            metric_types=[MetricType("custom-gauge", CustomGauge)]
+        )
+        metrics = registry.create_metrics(
+            [MetricConfig("metric", "Custom gauge metric", "custom-gauge")]
+        )
+        assert isinstance(metrics["metric"], CustomGauge)
 
     def test_get_metrics(self) -> None:
         registry = MetricsRegistry()

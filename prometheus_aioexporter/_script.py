@@ -18,8 +18,10 @@ import structlog
 
 from ._log import LogFormat, LogLevel, setup_logging
 from ._metric import (
+    DEFAULT_METRIC_TYPES,
     MetricConfig,
     MetricsRegistry,
+    MetricType,
 )
 from ._web import PrometheusExporter, PrometheusExporterConfig
 
@@ -83,7 +85,7 @@ class PrometheusExporterScript:
 
     def __init__(self) -> None:
         self._ensure_version()
-        self.registry = MetricsRegistry()
+        self.registry = MetricsRegistry(self.metric_types())
         self.logger = structlog.get_logger()
         self.command = self._setup_command()
 
@@ -99,6 +101,15 @@ class PrometheusExporterScript:
 
         """
         return self.__doc__ or ""
+
+    def metric_types(self) -> list[MetricType]:
+        """Return available metric types.
+
+        Subclasses can override this to return additional metric types or
+        override default classes for metrics.
+
+        """
+        return DEFAULT_METRIC_TYPES
 
     def command_line_parameters(self) -> list[click.Parameter]:
         """Add command line options and parameters.
