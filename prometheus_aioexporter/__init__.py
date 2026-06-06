@@ -1,9 +1,11 @@
 """Asyncio library for creating Prometheus exporters."""
 
 from ._metric import (
+    DEFAULT_METRIC_TYPES,
     InvalidMetricType,
     MetricConfig,
     MetricsRegistry,
+    MetricType,
 )
 from ._script import Arguments, PrometheusExporterScript
 from ._web import (
@@ -13,10 +15,12 @@ from ._web import (
 )
 
 __all__ = [
+    "DEFAULT_METRIC_TYPES",
     "EXPORTER_APP_KEY",
     "Arguments",
     "InvalidMetricType",
     "MetricConfig",
+    "MetricType",
     "MetricsRegistry",
     "PrometheusExporter",
     "PrometheusExporterConfig",

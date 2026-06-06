@@ -24,19 +24,20 @@ from prometheus_client.registry import Collector
 class MetricType:
     """Details about a metric type."""
 
+    name: str
     cls: type[MetricWrapperBase]
     options: list[str] = field(default_factory=list)
 
 
-# Map metric types to their MetricTypes
-METRIC_TYPES: dict[str, MetricType] = {
-    "counter": MetricType(cls=Counter),
-    "enum": MetricType(cls=Enum, options=["states"]),
-    "gauge": MetricType(cls=Gauge),
-    "histogram": MetricType(cls=Histogram, options=["buckets"]),
-    "info": MetricType(cls=Info),
-    "summary": MetricType(cls=Summary),
-}
+# Default metric types
+DEFAULT_METRIC_TYPES = [
+    MetricType("counter", Counter),
+    MetricType("enum", Enum, options=["states"]),
+    MetricType("gauge", Gauge),
+    MetricType("histogram", Histogram, options=["buckets"]),
+    MetricType("info", Info),
+    MetricType("summary", Summary),
+]
 
 
 @dataclass
@@ -51,19 +52,16 @@ class MetricConfig:
 
     def __post_init__(self) -> None:
         self.labels = tuple(sorted(self.labels))
-        if self.type not in METRIC_TYPES:
-            raise InvalidMetricType(self.name, self.type)
 
 
 class InvalidMetricType(Exception):
     """Raised when invalid metric type is found."""
 
-    def __init__(self, name: str, invalid_type: str):
+    def __init__(self, name: str, invalid_type: str) -> None:
         self.name = name
         self.invalid_type = invalid_type
-        type_list = ", ".join(sorted(METRIC_TYPES))
         super().__init__(
-            f"Invalid type for {self.name}: must be one of {type_list}"
+            f"Invalid type '{self.invalid_type}' for metric '{self.name}'"
         )
 
 
@@ -72,8 +70,13 @@ class MetricsRegistry:
 
     registry: CollectorRegistry
 
-    def __init__(self) -> None:
+    def __init__(
+        self, metric_types: t.Iterable[MetricType] | None = None
+    ) -> None:
         self.registry = CollectorRegistry(auto_describe=True)
+        if metric_types is None:
+            metric_types = DEFAULT_METRIC_TYPES
+        self._metric_types = {mt.name: mt for mt in metric_types}
         self._metrics: dict[str, MetricWrapperBase] = {}
 
     def create_metrics(
@@ -110,7 +113,10 @@ class MetricsRegistry:
         self.registry.register(collector)
 
     def _register_metric(self, config: MetricConfig) -> MetricWrapperBase:
-        metric_type = METRIC_TYPES[config.type]
+        try:
+            metric_type = self._metric_types[config.type]
+        except KeyError:
+            raise InvalidMetricType(config.name, config.type)
         options = {
             key: value
             for key, value in config.config.items()
