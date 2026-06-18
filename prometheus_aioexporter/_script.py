@@ -216,6 +216,15 @@ class PrometheusExporterScript:
                 show_envvar=True,
             ),
             click.Option(
+                ["--log-locals-json"],
+                help="log local variables when in the JSON output format",
+                type=bool,
+                is_flag=True,
+                default=False,
+                show_default=True,
+                show_envvar=True,
+            ),
+            click.Option(
                 ["--process-stats"],
                 help="include process stats in metrics",
                 type=bool,
@@ -266,7 +275,7 @@ class PrometheusExporterScript:
             sys.exit(1)
 
     def _execute(self, args: Arguments) -> None:
-        setup_logging(args.log_format, args.log_level)
+        setup_logging(args.log_format, args.log_level, args.log_locals_json)
         self.logger.info(
             "startup", version=self.version, python_version=sys.version
         )
