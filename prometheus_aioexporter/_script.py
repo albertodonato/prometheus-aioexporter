@@ -27,7 +27,7 @@ from ._web import PrometheusExporter, PrometheusExporterConfig
 class Arguments:
     """Holds parsed arguments for a script."""
 
-    def __init__(self, **values: t.Any) -> None:
+    def __init__(self, **values: t.Any) -> None:  # noqa: ANN401
         self._values = values
 
     def __repr__(self) -> str:
@@ -36,12 +36,12 @@ class Arguments:
         )
         return f"{self.__class__.__name__}({args})"
 
-    def __eq__(self, other: t.Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Arguments):
             return NotImplemented
         return self._values == other._values
 
-    def __getattr__(self, name: str) -> t.Any:
+    def __getattr__(self, name: str) -> t.Any:  # noqa: ANN401
         try:
             return self._values[name]
         except KeyError:
@@ -258,7 +258,7 @@ class PrometheusExporterScript:
         )(command)
         return command
 
-    def _command_callback(self, **kwargs: t.Any) -> None:
+    def _command_callback(self, **kwargs: t.Any) -> None:  # noqa: ANN401
         try:
             self._execute(Arguments(**kwargs))
         except Exception as e:
