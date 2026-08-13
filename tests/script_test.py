@@ -33,7 +33,7 @@ class SampleScript(PrometheusExporterScript):
 
 @pytest.fixture
 def make_arguments() -> Iterator[Callable[..., Arguments]]:
-    def make(**kwargs: t.Any) -> Arguments:
+    def make(**kwargs: t.Any) -> Arguments:  # noqa: ANN401
         args = {
             "host": ("localhost",),
             "port": 9090,

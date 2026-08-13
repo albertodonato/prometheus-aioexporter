@@ -43,7 +43,7 @@ class PrometheusExporterConfig:
     ssl_context: SSLContext | None = None
     server_version: str = field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         object.__setattr__(
             self, "server_version", f"{self.name}/{self.version}"
         )
@@ -102,7 +102,9 @@ class PrometheusExporter:
         app.router.add_get(self.config.metrics_path, self._handle_metrics)
         app.on_startup.append(self._log_startup_message)
 
-        async def on_prepare(request: Request, response: Response) -> None:
+        async def on_prepare(
+            request: Request, response: StreamResponse
+        ) -> None:
             response.headers["Server"] = self.config.server_version
 
         app.on_response_prepare.append(on_prepare)
