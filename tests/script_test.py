@@ -39,6 +39,7 @@ def make_arguments() -> Iterator[Callable[..., Arguments]]:
             "port": 9090,
             "metrics_path": "/metrics",
             "log_level": LogLevel.INFO,
+            "log_locals_json": False,
             "log_format": LogFormat.PLAIN,
             "process_stats": False,
             "ssl_private_key": None,
@@ -203,10 +204,12 @@ class TestPrometheusExporterScript:
             "json",
             "--log-level",
             "debug",
+            "--log-locals-json",
         )
         assert args.process_stats
         assert args.log_format == LogFormat.JSON
         assert args.log_level == LogLevel.DEBUG
+        assert args.log_locals_json == True
 
     def test_arguments_from_cli(
         self,
