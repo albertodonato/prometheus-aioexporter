@@ -89,11 +89,11 @@ ini_options.asyncio_mode = "auto"
 ini_options.structlog_keep = [ "TimeStamper", "add_log_level", "JSONRenderer" ]
 
 [tool.coverage]
-run.omit = [ "prometheus_aioexporter/sample.py" ]
 run.source = [ "prometheus_aioexporter" ]
+run.omit = [ "prometheus_aioexporter/sample.py" ]
 report.fail_under = 100.0
-report.show_missing = true
 report.skip_covered = true
+report.show_missing = true
 
 [tool.tox.env.check]
 dependency_groups = [ "dev", "tests" ]
