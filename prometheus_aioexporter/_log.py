@@ -52,6 +52,7 @@ class AccessLogger(AbstractAccessLogger):
 def setup_logging(
     log_format: LogFormat = LogFormat.PLAIN,
     log_level: LogLevel = LogLevel.WARNING,
+    log_locals_json: bool = False,
 ) -> None:
     """Setup logging for the application."""
 
@@ -63,7 +64,7 @@ def setup_logging(
             structlog.processors.add_log_level,
             structlog.processors.ExceptionRenderer(
                 structlog.tracebacks.ExceptionDictTransformer(
-                    show_locals=False
+                    show_locals=log_locals_json
                 )
             ),
             structlog.processors.JSONRenderer(),
